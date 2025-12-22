@@ -70,28 +70,22 @@ We track a single hand to control two axes of movement:
 * Hand moves Right → Orbit View Right (Yaw).  
 * Hand moves Up → Orbit View Up (Pitch).
 
-  **Calculation:** Normalized vector distance from the image center *(0.5, 0.5)*.
+**Calculation:** Normalized vector distance from the image center *(0.5, 0.5)*.
 
-  ### Zoom (Dolly):
+### Zoom (Dolly):
 
-  **Input:** Euclidean distance between Index Finger Tip (8) and Thumb Tip (4).
+**Input:** Euclidean distance between Index Finger Tip (8) and Thumb Tip (4).
 
-  **Logic:**
+**Logic:**
 
 * Pinch In (Tips touching) → Zoom In.  
 * Open Hand → Stop Zoom/Zoom Out (depending on calibration).
 
-  **Smoothing:** Changes in zoom values are smoothed to prevent "stuttery" camera movement.
+**Smoothing:** Changes in zoom values are smoothed to prevent "stuttery" camera movement.
 
-  ---
+---
 
-
-  
-
-
-  
-
-  # **5\. Data Interface (UDP Protocol)**
+# **5\. Data Interface (UDP Protocol)**
 
 Connection:  127.0.0.1  (Localhost) on Port  5555  .
 
