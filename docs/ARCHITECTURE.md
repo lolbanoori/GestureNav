@@ -91,7 +91,15 @@ Connection:  127.0.0.1  (Localhost) on Port  5555  .
 
 **Packet Structure (JSON encoded bytes):** The Server sends this packet 30-60 times per second.
 
-| {  "state": "active",       // Enum: "active", "idle", "lost\_tracking"  "orbit\_x": 0.05,         // Float: \-1.0 to 1.0 (Horizontal speed)  "orbit\_y": \-0.02,        // Float: \-1.0 to 1.0 (Vertical speed)  "zoom\_delta": 0.0        // Float: Positive \= In, Negative \= Out} |
+```
+| {
+  "state": "active",       // Enum: "active", "idle", "lost\_tracking"
+  "orbit\_x": 0.05,         // Float: \-1.0 to 1.0 (Horizontal speed)
+  "orbit\_y": \-0.02,        // Float: \-1.0 to 1.0 (Vertical speed)
+  "zoom\_delta": 0.0        // Float: Positive \= In, Negative \= Out
+} |
+```
+
 | :---- |
 
 ---
@@ -108,7 +116,10 @@ Connection:  127.0.0.1  (Localhost) on Port  5555  .
 
 # **7\. Directory Structure**
 
+```
 | GestureNav/ ├── assets/                      │   └── gesturenav\_hero.png      ├── client/                     \# Blender Add-on Code ├── server/                     \# Python Computer Vision Code ├── docs/                        │   ├── INSTALL.md              \# Installation & Setup Guide │   ├── USER\_MANUAL.md          \# User Manual & Gesture Guide │   ├── ARCHITECTURE.md         \# Technical Design Document │   └── ROADMAP.md              \# Product Roadmap ├── .gitignore                   ├── LICENSE                      ├── requirements.txt            \# Python dependencies └── README.md                    |
+```
+
 | :---- |
 
 [image1]: <data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAm0AAAALCAYAAAAtObrQAAAAw0lEQVR4Xu3WMY0CABQFQWSdA1QggBIvOEAJCq4+BZgggfz20d4j+ckUo2H38Hu/vui5Pf7gw/PyA6udT0fgyw45GfyvjDWMDCBskzEB+kxbWcYaRgYQtsmYAH2mrSxjDSMDCNtkTIA+01aWsYaRAYRtMiZAn2kry1jDyADCNhkToM+0lWWsYWQAYZuMCdBn2soy1jAygLBNxgToM21lGWsYGUDYJmMC9Jm2sow1jAwgbJMxAfpMW1nGGkYGELbJmAB9bxL59nuswkk6AAAAAElFTkSuQmCC>
