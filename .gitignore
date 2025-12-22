@@ -179,3 +179,13 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# Blender
+*.blend1
+*.blend2
+*.blend@
+quit.blend
+
+# OS Junk
+.DS_Store
+Thumbs.db
