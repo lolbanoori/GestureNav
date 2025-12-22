@@ -39,19 +39,19 @@ Open your terminal, navigate to the ```GestureNav/``` folder, and run the follow
 pip install \-r requirements.txt
 ```
 
-* *If you see an error saying  pip  is not recognized, try  python \-m pip install \-r requirements.txt* 
+* *If you see an error saying ```pip``` is not recognized, try ```python \-m pip install \-r requirements.txt```* 
 
 ### 3\. Test the Server
 
 Before opening Blender, let's make sure the camera works.
 
-1. Navigate to the  server/  folder in your terminal.  
+1. Navigate to the ```server/``` folder in your terminal.  
 2. Run the script:
 ```
 python main.py
 ```
 
-3. If successful, your webcam light should turn on, and you should see text indicating:     Server listening on 127.0.0.1:5555 .  
+3. If successful, your webcam light should turn on, and you should see text indicating: ```*Server listening on 127.0.0.1:5555*```
 
 ---
 
@@ -60,15 +60,15 @@ python main.py
 Now we need to teach Blender how to listen to the Server.
 
 1. **Zip the Client Folder:**  
-   * Go to your  GestureNav  directory.  
-   * Right-click the  client  folder and choose **Send to \> Compressed (zipped) folder**.  
+   * Go to your ```GestureNav``` directory.  
+   * Right-click the ```client``` folder and choose **Send to \> Compressed (zipped) folder**.  
    * Name it  GestureNav\_Client.zip .  
 2. **Install in Blender:**  
    * Open Blender (Version 3.0 or higher).  
    * Go to **Edit \> Preferences**.  
    * Click on the **Add-ons** tab.  
-   * Click **Install...** (top right).  
-   * Select your  GestureNav\_Client.zip  file.  
+   * Click **Install...** (top right).
+   * Select your ```GestureNav\_Client.zip``` file.  
 3. **Activate:**  
    * Search for "GestureNav" in the list.  
    * Check the box to enable **3D View: GestureNav Client**.
@@ -81,8 +81,8 @@ Now we need to teach Blender how to listen to the Server.
 
 By default, GestureNav is configured to run on a single machine.
 
-* **IP:**  127.0.0.1  (This means "this computer")  
-* **Port:**  5555  
+* **IP:** ```127.0.0.1``` (This means "this computer")  
+* **Port:** ```5555```
 
 ### **Dual-PC Setup (Advanced)**
 
@@ -90,11 +90,11 @@ If you want to run the Vision Server on a laptop (to save resources) and control
 
 1. **Find the Server's IP:**  
    * On the computer running the webcam (Server), open Command Prompt.  
-   * Type  ipconfig  (Windows) or  ifconfig  (Mac/Linux).  
-   * Look for **IPv4 Address**. It usually looks like  192.168.1.XX .  
+   * Type ```ipconfig``` (Windows) or ```ifconfig``` (Mac/Linux).  
+   * Look for **IPv4 Address**. It usually looks like ```192.168.1.XX```  
 2. **Configure the Script:**  
-   * Open  server/main.py  . Change  UDP\_IP \= "127.0.0.1"  to  "0.0.0.0"   (this allows it to broadcast).  
-   * Open  client/operator\_listen.py  . Change  UDP\_IP  to the Server's IPv4 address found in step 1\.
+   * Open ```server/main.py```. Change ```UDP\_IP \= "127.0.0.1"```  to ```"0.0.0.0"``` (this allows it to broadcast).  
+   * Open ```client/operator\_listen.py```. Change ```UDP\_IP``` to the Server's IPv4 address found in step 1.
 
 ---
 
@@ -110,7 +110,7 @@ If you want to run the Vision Server on a laptop (to save resources) and control
 
 1. Press the Windows Key and type **"Allow an app through Windows Firewall"**.  
 2. Click **Change Settings** (Requires Admin).  
-3. Look for  python.exe  (or  python  ).  
+3. Look for ```python.exe``` (or ```python```).  
 4. Ensure both **Private** and **Public** checkboxes are ticked.  
 5. Click OK.
 
@@ -119,7 +119,7 @@ If you want to run the Vision Server on a laptop (to save resources) and control
 
 This means the dependencies were installed in a different Python environment than the one you are running.
 
-* **Fix:** Ensure you are running the server using the same python executable you used for pip. Try  python \-m pip install mediapipe  directly.
+* **Fix:** Ensure you are running the server using the same python executable you used for pip. Try ```python \-m pip install mediapipe``` directly.
 
 ### **Issue: Lag or Jitter**
 
