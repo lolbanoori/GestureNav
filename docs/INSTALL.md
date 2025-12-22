@@ -51,7 +51,7 @@ Before opening Blender, let's make sure the camera works.
 python main.py
 ```
 
-3. If successful, your webcam light should turn on, and you should see text indicating: ```*Server listening on 127.0.0.1:5555*```
+3. If successful, your webcam light should turn on, and you should see text indicating: *```Server listening on 127.0.0.1:5555```*
 
 ---
 
