@@ -6,12 +6,10 @@ import logging
 # Setup logging
 logger = logging.getLogger(__name__)
 
-class GestureNav_OT_Listen(bpy.types.Operator):
-    """GestureNav UDP Listener"""
-    bl_idname = "gesturenav.listen"
-    bl_label = "GestureNav Listener"
-    
-    action: bpy.props.StringProperty(name="Action", default="START")
+class GestureNav_OT_Start(bpy.types.Operator):
+    """Start the GestureNav UDP Listener"""
+    bl_idname = "gesturenav.start"
+    bl_label = "Start Listener"
     
     _timer = None
     _sock = None
@@ -25,59 +23,37 @@ class GestureNav_OT_Listen(bpy.types.Operator):
             
         if event.type == 'TIMER':
             try:
-                # Attempt to receive data
                 data, addr = self._sock.recvfrom(1024)
                 message = data.decode('utf-8')
-                
-                # Parse JSON
                 try:
                     payload = json.loads(message)
                     print(f"[GestureNav] Received: {payload}")
                 except json.JSONDecodeError:
-                    print(f"[GestureNav] Received malformed JSON: {message}")
-                    
+                    print(f"[GestureNav] Malformed JSON: {message}")
             except BlockingIOError:
-                # No data waiting, this is expected
                 pass
-            except socket.error as e:
-                print(f"[GestureNav] Socket error: {e}")
             except Exception as e:
-                print(f"[GestureNav] Unexpected error: {e}")
+                print(f"[GestureNav] Error: {e}")
                 
         return {'PASS_THROUGH'}
 
-    def execute(self, context):
-        if self.action == "START":
-            return self.invoke(context, None)
-        elif self.action == "STOP":
-            context.scene.gesturenav_listening = False
-            return {'FINISHED'}
-        return {'CANCELLED'}
-
     def invoke(self, context, event):
-        if self.action == "STOP":
-            context.scene.gesturenav_listening = False
+        scene = context.scene
+        if scene.gesturenav_listening:
             return {'FINISHED'}
 
-        scene = context.scene
-        
-        if scene.gesturenav_listening:
-             return {'FINISHED'}
-
-        # Setup Socket
         try:
             self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             self._sock.bind(('127.0.0.1', 5555))
             self._sock.setblocking(False)
             print("[GestureNav] Socket bound to 127.0.0.1:5555")
         except OSError as e:
-            self.report({'ERROR'}, f"Could not bind to port 5555: {e}")
+            self.report({'ERROR'}, f"Socket Error: {e}")
             return {'CANCELLED'}
 
-        # Start Modal
         scene.gesturenav_listening = True
         wm = context.window_manager
-        self._timer = wm.event_timer_add(0.016, window=context.window) # ~60fps
+        self._timer = wm.event_timer_add(0.016, window=context.window)
         wm.modal_handler_add(self)
         
         print("[GestureNav] Listener Started")
@@ -87,11 +63,19 @@ class GestureNav_OT_Listen(bpy.types.Operator):
         wm = context.window_manager
         if self._timer:
             wm.event_timer_remove(self._timer)
-        
         if self._sock:
             self._sock.close()
             self._sock = None
-            
         context.scene.gesturenav_listening = False
         print("[GestureNav] Listener Stopped")
+        return {'FINISHED'}
+
+class GestureNav_OT_Stop(bpy.types.Operator):
+    """Stop the GestureNav UDP Listener"""
+    bl_idname = "gesturenav.stop"
+    bl_label = "Stop Listener"
+    
+    def execute(self, context):
+        context.scene.gesturenav_listening = False
+        print("[GestureNav] Stop Signal Sent")
         return {'FINISHED'}
