@@ -34,7 +34,7 @@ python \--version
 
 ### 2\. Install Dependencies
 
-Open your terminal, navigate to the GestureNav/ folder, and run the following command to install the necessary libraries (MediaPipe, OpenCV, NumPy):
+Open your terminal, navigate to the ```GestureNav/``` folder, and run the following command to install the necessary libraries (MediaPipe, OpenCV, NumPy):
 ```
 pip install \-r requirements.txt
 ```
