@@ -2,7 +2,7 @@
 > **Touchless 3D Navigation for Blender**
 
 <div align="center">
-  #User Manual & Gesture Guide
+  <h1>User Manual & Gesture Guide</h1>
 </div>
 
 Welcome to a new way of interacting with Blender. GestureNav allows you to manipulate your 3D Viewport using only your hands. Because this tool relies on computer vision, "speaking" its language clearly is key to a smooth experience.
