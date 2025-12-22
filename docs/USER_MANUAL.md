@@ -1,7 +1,9 @@
 # **GestureNav**
 > **Touchless 3D Navigation for Blender**
 
-User Manual & Gesture Guide
+<div align="center">
+  #User Manual & Gesture Guide
+</div>
 
 Welcome to a new way of interacting with Blender. GestureNav allows you to manipulate your 3D Viewport using only your hands. Because this tool relies on computer vision, "speaking" its language clearly is key to a smooth experience.
 
@@ -26,8 +28,7 @@ Imagine driving a car. You don't want the car to move every time you bump the st
 GestureNav tracks your **Right Hand** by default. It distinguishes between three specific hand shapes to determine *what* you want to do.
 
 ### A. Orbit (Rotate View)
-
-The Metaphor: "Grabbing the World."
+*The Metaphor: "Grabbing the World."*
 
 Imagine the 3D object is floating in the air physically. To turn it, you would grab it and turn your wrist.
 
@@ -39,8 +40,7 @@ Imagine the 3D object is floating in the air physically. To turn it, you would g
   4. **Up/Down:** Tilts the view over/under the object.
 
 ### B. Pan (Strafe/Move View)
-
-The Metaphor: "Pushing the Air."
+*The Metaphor: "Pushing the Air."*
 
 Imagine the 3D view is a sheet of paper on a desk. You want to slide the paper sideways without turning it.
 
@@ -51,8 +51,7 @@ Imagine the 3D view is a sheet of paper on a desk. You want to slide the paper s
   3. The view will slide laterally, tracking your hand movement perfectly.
 
 ### C. Zoom (Dolly In/Out)
-
-The Metaphor: "Stretching the Image."
+*The Metaphor: "Stretching the Image."*
 
 This works exactly like pinching a touch screen on a smartphone.
 
@@ -68,16 +67,14 @@ This works exactly like pinching a touch screen on a smartphone.
 
 Computer vision is magical, but it is sensitive to the real world. Follow these three rules to prevent "jittery" movement.
 
-#### **Rule 1: Lighting is Everything**
+### **Rule 1: Lighting is Everything**
 
 Webcams adjust exposure automatically. If you have a bright window behind you (Backlighting), your face and hand will become dark silhouettes. The computer cannot see your fingers in the dark.
 
 * **Bad:** Window behind you.  
 * **Good:** Lamp in front of you (illuminating your hand).
 
---- 
-
-#### **Rule 2: The "Deadzone"**
+### **Rule 2: The "Deadzone"**
 
 GestureNav uses a virtual joystick logic.
 
@@ -85,7 +82,7 @@ GestureNav uses a virtual joystick logic.
 * **Edges of Camera Frame:** This is "Max Velocity."  
 * **Tip:** If the camera is drifting, bring your hand back to the center of your chest/webcam view to stop it.
 
-#### **Rule 3: Keep it Clean**
+### **Rule 3: Keep it Clean**
 
 Avoid "noisy" backgrounds if possible. If there are other people moving behind you, or if you have a poster of a hand on your wall, the AI might get confused.
 
@@ -93,7 +90,7 @@ Avoid "noisy" backgrounds if possible. If there are other people moving behind y
 
 ---
 
-#### **Troubleshooting Quick-List**
+## **Troubleshooting Quick-List**
 
 * **View Spinning Uncontrollably?** → You are outside the "Deadzone." Center your hand.  
 * **Zoom Jumping?** → Your lighting is too dim; the camera can't see your fingertips clearly.  
