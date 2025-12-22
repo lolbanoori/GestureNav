@@ -3,35 +3,29 @@
 ![][image2]
 
 # **GestureNav**
+> **Touchless 3D Navigation for Blender**
 
-## *Touchless 3D Navigation.*
-
-**─**
-
-Zohair Banoori  
-Banoori Studios 
-
-# **1\. Executive Summary**
+## **1\. Executive Summary**
 
 A specialized tool allowing Blender users to orbit and zoom the 3D viewport using hand gestures captured via a laptop webcam. The system prioritizes viewport performance by decoupling heavy computer vision processing from Blender’s internal update loop.
 
 ---
 
-# **2\. System Architecture: "The Puppeteer Pattern"**
+## **2\. System Architecture: "The Puppeteer Pattern"**
 
 We utilize a **Decoupled Client-Server** architecture over a local UDP network. This ensures that the heavy image processing (Server) never blocks the Blender UI thread (Client).
 
-## The Server (Brain): 
+### The Server (Brain): 
 
 A standalone Python process that runs OpenCV and MediaPipe. It calculates vector deltas and broadcasts them.
 
-## The Client (Body): 
+### The Client (Body): 
 
 A lightweight Blender Add-on that listens to a specific port and applies transforms to the Viewport.
 
 ---
 
-# **3\. Technology Stack**
+## **3\. Technology Stack**
 
 	
 
@@ -47,19 +41,19 @@ A lightweight Blender Add-on that listens to a specific port and applies transfo
 
 ---
 
-# **4\. Functional Logic (Single-Hand Control)**
+## **4\. Functional Logic (Single-Hand Control)**
 
-## A. Trigger Mechanism
+### A. Trigger Mechanism
 
 **Type:** Keyboard Toggle (e.g.,  Caps Lock  or custom hotkey).
 
 **Behavior:** The system enters a "Listening" state only when triggered. It acts as a safety clutch to prevent accidental camera movement while working.
 
-## B. Navigation Logic (The "Virtual Joystick")
+### B. Navigation Logic (The "Virtual Joystick")
 
 We track a single hand to control two axes of movement:
 
-### Orbit (Rotate):
+#### Orbit (Rotate):
 
 **Input:** Position of the Wrist Landmark (Index 0).
 
@@ -72,7 +66,7 @@ We track a single hand to control two axes of movement:
 
 **Calculation:** Normalized vector distance from the image center *(0.5, 0.5)*.
 
-### Zoom (Dolly):
+#### Zoom (Dolly):
 
 **Input:** Euclidean distance between Index Finger Tip (8) and Thumb Tip (4).
 
@@ -85,7 +79,7 @@ We track a single hand to control two axes of movement:
 
 ---
 
-# **5\. Data Interface (UDP Protocol)**
+## **5\. Data Interface (UDP Protocol)**
 
 Connection:  127.0.0.1  (Localhost) on Port  5555  .
 
@@ -102,7 +96,7 @@ Connection:  127.0.0.1  (Localhost) on Port  5555  .
 
 ---
 
-# **6\. Implementation Phases**
+## **6\. Implementation Phases**
 
 **Phase 1: Comms Skeleton** → Create the Blender Add-on listener to verify it can receive data without crashing the UI.
 
@@ -112,7 +106,7 @@ Connection:  127.0.0.1  (Localhost) on Port  5555  .
 
 ---
 
-# **7\. Directory Structure**
+## **7\. Directory Structure**
 
 ```
 GestureNav/
