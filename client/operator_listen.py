@@ -55,6 +55,10 @@ class GestureNav_OT_Listen(bpy.types.Operator):
         return {'CANCELLED'}
 
     def invoke(self, context, event):
+        if self.action == "STOP":
+            context.scene.gesturenav_listening = False
+            return {'FINISHED'}
+
         scene = context.scene
         
         if scene.gesturenav_listening:
