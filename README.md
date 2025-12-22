@@ -1,7 +1,7 @@
 # GestureNav
 > **Touchless 3D Navigation for Blender**
 
-![GestureNav Hero Image](assets/gesturenav_hero.png)
+![GestureNav Hero Image](assets/GestureNav_hero.png)
 
 **GestureNav** is a professional tool that decouples computer vision from Blender's internal loop, allowing users to orbit, pan, and zoom the 3D viewport using hand gestures captured via a standard webcam.
 
