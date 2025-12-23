@@ -80,9 +80,12 @@ class GestureNav_OT_Start(bpy.types.Operator):
                 print(f"[GestureNav] Op Error (Legacy API): {e}")
 
     def process_navigation(self, context, payload):
+        # print("DEBUG: Process Nav Running")
         # 1. State Update (EMA Smoothing)
         target_x = payload.get('x', 0.0)
         target_y = payload.get('y', 0.0)
+        
+        r3d = None  # Defensive Initialization
         
         # Get Client Sensitivities
         orbit_sens = context.scene.gesturenav_orbit_sensitivity
@@ -100,6 +103,11 @@ class GestureNav_OT_Start(bpy.types.Operator):
             
         if not area:
             return
+            
+        # Get 3D Region Data (for manual zoom)
+        r3d = None
+        if area.spaces.active.type == 'VIEW_3D':
+            r3d = area.spaces.active.region_3d
             
         # Context Override for bpy.ops
         # Note: 'window' and 'screen' are usually required for temp_override
@@ -120,10 +128,11 @@ class GestureNav_OT_Start(bpy.types.Operator):
                 
         # 4. Apply Zoom (Manual Distance for Smoothness)
         zoom_state = payload.get('zoom', 0)
-        if zoom_state != 0:
+        if zoom_state != 0 and r3d:
             # Step size per frame
             zoom_sens = context.scene.gesturenav_zoom_sensitivity
             step = 0.01 * zoom_sens
+            # print(f"ZOOM: State={zoom_state}, Sens={zoom_sens}, Step={step}, PrevDist={r3d.view_distance}")
             r3d.view_distance -= zoom_state * step
             if area: area.tag_redraw()
 
