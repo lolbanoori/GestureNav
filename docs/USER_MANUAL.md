@@ -1,97 +1,87 @@
-# **GestureNav**
-> **Touchless 3D Navigation for Blender**
+# **GestureNav User Manual**
+> **Mastering Touchless Navigation**
 
 <div align="center">
-  <h1>User Manual & Gesture Guide</h1>
+  <h1>User Guide & Gesture Dictionary</h1>
 </div>
 
 Welcome to a new way of interacting with Blender. GestureNav allows you to manipulate your 3D Viewport using only your hands. Because this tool relies on computer vision, "speaking" its language clearly is key to a smooth experience.
 
-This guide will teach you the **Safety Clutch**, the **Gesture Dictionary**, and **Environmental Best Practices**.
+This guide will teach you the **Safety Clutch**, the **Gesture Dictionary**, and how to use the **Configuration Dashboard**.
 
 ---
 
-## **1\. The "Clutch" Concept (Safety First)**
+## **1. The "Clutch" Concept (Safety First)**
 
 Imagine driving a car. You don't want the car to move every time you bump the steering wheel while parked. GestureNav works the same way.
 
-* **The Problem:** Your webcam is always on. If you scratch your nose or reach for your coffee, the camera might think you are trying to rotate the view.  
-* **The Solution:** The **"Listener"** (Clutch).  
 * **Inactive State (Default):** The camera ignores you. You can move freely.  
-* **Active State:** You must explicitly click **"Start Listener"** in the Blender side panel (or press the assigned hotkey).  
+* **Active State:** You must explicitly click **"Start Listener"** in the Blender side panel.  
 * **Rule of Thumb:** Only engage the Listener when you are ready to navigate. Disengage it when you return to modeling or sculpting with the mouse.
 
 ---
 
-## **2\. The Gesture Dictionary**
+## **2. The Gesture Dictionary**
 
-GestureNav tracks your **Right Hand** by default. It distinguishes between three specific hand shapes to determine *what* you want to do.
+GestureNav tracks your hand (Left or Right, configurable) to control the camera.
 
-### A. Orbit (Rotate View)
-*The Metaphor: "Grabbing the World."*
+### A. Orbit (The Virtual Joystick)
+*The Metaphor: "Leaning the Stick."*
 
-Imagine the 3D object is floating in the air physically. To turn it, you would grab it and turn your wrist.
+GestureNav puts a "Deadzone Circle" in the center of your camera view.
+*   **Stop:** Keep your hand inside the Green Circle.
+*   **Orbit:** Move your hand **outside** the circle.
+*   **Speed:** The further you reach, the faster the camera spins.
 
-* **The Gesture:** **Closed Fist.**  
-* **How to Perform:**  
-  1. Close your fingers into a fist.  
-  2. **Move your hand** (not just your wrist) in the air.  
-  3. **Right/Left:** Rotates the view around the object.  
-  4. **Up/Down:** Tilts the view over/under the object.
+### B. Zoom (The Pinch)
+*The Metaphor: "Stretching the View."*
 
-### B. Pan (Strafe/Move View)
-*The Metaphor: "Pushing the Air."*
+*   **Zoom In:** Pinch your **Thumb and Index Finger** together.
+*   **Zoom Out:** Spread your Thumb and Index Finger apart (wide "L" shape).
+*   **Idle:** Keep your fingers in a neutral, relaxed position.
 
-Imagine the 3D view is a sheet of paper on a desk. You want to slide the paper sideways without turning it.
+### C. Safety Locks
+*The Metaphor: "The Emergency Brake."*
 
-* **The Gesture:** **Open Palm** (fingers spread, facing the camera).  
-* **How to Perform:**  
-  1. Open your hand flat, palm facing the screen.  
-  2. **Move your hand** in any direction.  
-  3. The view will slide laterally, tracking your hand movement perfectly.
-
-### C. Zoom (Dolly In/Out)
-*The Metaphor: "Stretching the Image."*
-
-This works exactly like pinching a touch screen on a smartphone.
-
-* **The Gesture:** **The Pinch** (Index finger and Thumb).  
-* **How to Perform:**  
-  1. Face your palm toward the camera.  
-  2. **Pinch In:** Bring your thumb and index finger tip together to **Zoom In**.  
-  3. **Spread Out:** Move your thumb and index finger apart to **Zoom Out**.
+Sometimes you need to reposition your hand without moving the camera.
+*   **Fist Lock (Zoom):** Make a tight **Fist**. This disables the Zoom engine. Use this to move your hand back to a comfortable position without accidentally zooming in/out.
+*   **Open Hand Lock (Orbit):** (Optional) If enabled in settings, opening your hand flat will stop the Orbit rotation.
 
 ---
 
-## **3\. Best Practices (Optimizing Performance)**
+## **3. The Configuration Dashboard**
 
-Computer vision is magical, but it is sensitive to the real world. Follow these three rules to prevent "jittery" movement.
+Located in the Blender Sidebar (N-Panel) > **GestureNav** tab.
+
+### Handedness
+Click **"Right Hand"** or **"Left Hand"** to automatically move the Deadzone to the bottom corner of the screen, so your arm doesn't block your monitor.
+
+### Tuning (Real-time)
+*   **Deadzone Radius:** Drag the slider to change how large the "Stop Circle" is.
+*   **Sensitivity:** Adjust how fast the camera responds to your movements.
+*   **Zoom Triggers:** Adjust the "Pinch In" vs "Pinch Out" gap to fit your hand size.
+
+### Persistence
+*   **Save Settings:** Saves your current tuning to `~/.gesturenav_config.json`.
+*   **Load Settings:** Loads your saved profile.
+*   **Reset Defaults:** Reverts to the factory calibration.
+
+---
+
+## **4. Best Practices**
 
 ### **Rule 1: Lighting is Everything**
-
-Webcams adjust exposure automatically. If you have a bright window behind you (Backlighting), your face and hand will become dark silhouettes. The computer cannot see your fingers in the dark.
-
-* **Bad:** Window behind you.  
-* **Good:** Lamp in front of you (illuminating your hand).
+Webcams need light. If you are backlit (bright window behind you), your hand will be a silhouette.
+*   **Good:** Lamp in front of you (illuminating your hand).
+*   **Bad:** Dark room or window behind you.
 
 ### **Rule 2: The "Deadzone"**
-
-GestureNav uses a virtual joystick logic.
-
-* **Center of Camera Frame:** This is "Zero Velocity." If your hand is here, the camera stops moving.  
-* **Edges of Camera Frame:** This is "Max Velocity."  
-* **Tip:** If the camera is drifting, bring your hand back to the center of your chest/webcam view to stop it.
-
-### **Rule 3: Keep it Clean**
-
-Avoid "noisy" backgrounds if possible. If there are other people moving behind you, or if you have a poster of a hand on your wall, the AI might get confused.
-
-* **Pro Tip:** Wear a sleeve color that contrasts with your skin tone. (e.g., Don't wear a beige shirt if you have beige skin; the camera might lose track of your wrist).  
+If the camera is drifting, look at the server window. bring your hand back to the **Green Circle** to stop it.
 
 ---
 
-## **Troubleshooting Quick-List**
+## **Troubleshooting**
 
-* **View Spinning Uncontrollably?** → You are outside the "Deadzone." Center your hand.  
-* **Zoom Jumping?** → Your lighting is too dim; the camera can't see your fingertips clearly.  
-* **Nothing Happening?** → Check if the **"Status: Listening..."** is active in the Blender N-Panel.
+*   **View Spinning Uncontrollably?** → You are outside the "Deadzone." Center your hand.
+*   **Zoom Jumping?** → Your lighting is too dim; the camera can't see your fingertips clearly.
+*   **Can't Connect?** → Ensure you ran `python server/main.py` **before** clicking start in Blender.

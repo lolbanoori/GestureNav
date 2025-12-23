@@ -1,43 +1,31 @@
-# **GestureNav**
-> **Touchless 3D Navigation for Blender**
+# **GestureNav Roadmap**
+> **Product Vision**
 
-## **Phase 1: The Core (MVP \- v1.0)** 
+## **Phase 1: The Core (v1.0 - v1.3) [COMPLETED]**
 
-*Focus: Stability & Basic Navigation*
-
-* **Architecture:** Validated "Puppeteer" Pattern (UDP Client-Server).  
-* **Features:**  
-  * Orbit (Fist \+ Move).  
-  * Zoom (Pinch In/Out).  
-  * "Clutch" Toggle (Keyboard hotkey to enable/disable listening).  
-* **UX:** Basic center-screen deadzone to prevent drift.
+*   [x] **Architecture:** Decoupled "Puppeteer" Pattern (UDP Client-Server).
+*   [x] **Navigation:** Orbit (Virtual Joystick) and Zoom (Pinch).
+*   [x] **Safety:** Fist Lock and Listening Mode Clutch.
+*   [x] **Configuration:** (Accelerated from Phase 3)
+    *   [x] Full Tuning Dashboard.
+    *   [x] Handedness Presets.
+    *   [x] Save/Load Persistence.
 
 ---
 
-## **Phase 2: The "Virtuoso" Update (v1.1)** 
+## **Phase 2: The "Virtuoso" Update (v1.5)**
 
 *Focus: Completing the Navigation Suite*
 
-* **Feature: Panning (Strafe).** Implementation of the "Open Palm" gesture to move the view laterally.  
-* **Feature: View Snapping.** Implementation of high-velocity "Swipes" to snap to Front/Side/Top views.  
-* **Feature: Focus Selected.** "Double Pinch" gesture to trigger  Numpad .  (Center view on object).
+*   [ ] **Feature: Panning (Strafe).** Implementation of the "Open Palm" gesture to move the view laterally.
+*   [ ] **Feature: View Snapping.** High-velocity "Swipes" to snap to Front/Side/Top views.
+*   [ ] **Feature: Focus Selected.** "Double Pinch" gesture to trigger `Numpad .` (Center view on object).
 
 ---
 
-## **Phase 3: User Customization (v1.5)** 
-
-*Focus: Accessibility & Comfort*
-
-* **Settings UI:** A panel in Blender to adjust:  
-  * **Sensitivity Curves:** Linear vs. Exponential (for finer control at slow speeds).  
-  * **Invert Axis:** For users who prefer "Flight Sim" controls (Up \= Down).  
-  * **Smoothing Factor:** Slider to trade off latency vs. smoothness.
-
----
-
-## **Phase 4: Advanced Control (v2.0)** 
+## **Phase 3: Advanced Control (v2.0)**
 
 *Focus: Beyond Navigation*
 
-* **Custom Gestures:** Ability to map a specific hand sign (e.g., "Peace Sign") to a specific Blender Operator (e.g.,  Undo  ,  Render  , or  Toggle X-Ray  ).  
-* **Multi-Modal Feedback:** Visual overlay in the 3D viewport showing the user's hand state (e.g., a small red dot when "Fist" is detected) so they know how the system is interpreting their hand.
+*   [ ] **Custom Gestures:** Map specific hand signs (e.g., "Peace Sign") to operators.
+*   [ ] **Visual Overlay:** Draw the hand skeleton directly inside the Blender 3D Viewport (using GPU module) instead of a separate window.

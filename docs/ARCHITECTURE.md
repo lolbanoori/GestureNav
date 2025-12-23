@@ -1,122 +1,110 @@
-# **GestureNav**
-> **Touchless 3D Navigation for Blender**
+# **GestureNav Architecture**
+> **Technical Design Document (v1.3)**
 
-## **1\. Executive Summary**
+## **1. Executive Summary**
 
 A specialized tool allowing Blender users to orbit and zoom the 3D viewport using hand gestures captured via a laptop webcam. The system prioritizes viewport performance by decoupling heavy computer vision processing from Blender’s internal update loop.
 
 ---
 
-## **2\. System Architecture: "The Puppeteer Pattern"**
+## **2. System Pattern: "The Puppet Master"**
 
 We utilize a **Decoupled Client-Server** architecture over a local UDP network. This ensures that the heavy image processing (Server) never blocks the Blender UI thread (Client).
 
 ### The Server (Brain): 
-
-A standalone Python process that runs OpenCV and MediaPipe. It calculates vector deltas and broadcasts them.
+A standalone Python process that runs OpenCV and MediaPipe. 
+*   **Thread 1 (Main):** Captures video, tracks hands using MediaPipe Tasks, calculates vector deltas, and broadcasts navigation data to Port 5555.
+*   **Thread 2 (Config Listener):** Listens on Port 5556 for tuning updates from the Client.
 
 ### The Client (Body): 
-
-A lightweight Blender Add-on that listens to a specific port and applies transforms to the Viewport.
-
----
-
-## **3\. Technology Stack**
-
-	
-
-| Component Category | Technology / Library | Specific Component | Target Version | Integration Status | Primary Function in System |
-| :---- | :---- | :---- | :---- | :---- | :---- |
-| Operating System | Windows 10/11 | OS Environment | N/A | Finalized | Target Platform for Application Deployment |
-| Backend/Server | Python (External) | Server Host | 3.10 or 3.11 | Finalized | Hosting the Vision Processing Engine |
-| Vision Processing | mediapipe | Hand Tracking | Latest | Finalized | High-performance Real-time Hand Tracking |
-| Vision Processing | opencv-python | Video Stream Handler | Latest | Finalized | Webcam Stream Capture and Processing |
-| Core Utilities | numpy | Mathematical Operations | Latest | Finalized | Efficient Vector and Matrix Calculations |
-| Frontend/Client | Blender Python API | 3D View Controller | 3.0+ | Finalized | Manipulating and Updating the 3D Scene View |
-| Communication | socket (Std Lib) | Communication Protocol | N/A | Finalized | Local UDP Communication between Client and Server |
+A lightweight Blender Add-on.
+*   **Operator:** Runs a modal timer to listen to Port 5555 and applies transforms to the Viewport.
+*   **UI Panel:** Sends configuration JSON packets to Port 5556 whenever a slider is moved.
 
 ---
 
-## **4\. Functional Logic (Single-Hand Control)**
+## **3. Data Interface (Bidirectional UDP)**
 
-### A. Trigger Mechanism
+### Downstream: Navigation Data
+**Server -> Client (Port 5555)**
+*Frequency: 30-60Hz*
 
-**Type:** Keyboard Toggle (e.g.,  Caps Lock  or custom hotkey).
-
-**Behavior:** The system enters a "Listening" state only when triggered. It acts as a safety clutch to prevent accidental camera movement while working.
-
-### B. Navigation Logic (The "Virtual Joystick")
-
-We track a single hand to control two axes of movement:
-
-#### Orbit (Rotate):
-
-**Input:** Position of the Wrist Landmark (Index 0).
-
-**Logic:** Defined by a "Deadzone" in the center of the camera frame.
-
-**Action:**
-
-* Hand moves Right → Orbit View Right (Yaw).  
-* Hand moves Up → Orbit View Up (Pitch).
-
-**Calculation:** Normalized vector distance from the image center *(0.5, 0.5)*.
-
-#### Zoom (Dolly):
-
-**Input:** Euclidean distance between Index Finger Tip (8) and Thumb Tip (4).
-
-**Logic:**
-
-* Pinch In (Tips touching) → Zoom In.  
-* Open Hand → Stop Zoom/Zoom Out (depending on calibration).
-
-**Smoothing:** Changes in zoom values are smoothed to prevent "stuttery" camera movement.
-
----
-
-## **5\. Data Interface (UDP Protocol)**
-
-Connection:  127.0.0.1  (Localhost) on Port  5555  .
-
-**Packet Structure (JSON encoded bytes):** The Server sends this packet 30-60 times per second.
-
-```
+Packet Structure:
+```json
 {
-  "state": "active",       // Enum: "active", "idle", "lost\_tracking"
-  "orbit\_x": 0.05,         // Float: \-1.0 to 1.0 (Horizontal speed)
-  "orbit\_y": \-0.02,        // Float: \-1.0 to 1.0 (Vertical speed)
-  "zoom\_delta": 0.0        // Float: Positive \= In, Negative \= Out
+  "state": "active",       // "active" or "idle"
+  "x": 0.5,                // Float: -1.0 to 1.0 (Orbit X Speed)
+  "y": -0.2,               // Float: -1.0 to 1.0 (Orbit Y Speed)
+  "zoom": 1                // Integer: 1 (In), -1 (Out), 0 (None)
+}
+```
+
+### Upstream: Configuration Data
+**Client -> Server (Port 5556)**
+*Frequency: On Change*
+
+Packet Structure:
+```json
+{
+  "deadzone_radius": 0.12,
+  "deadzone_offset_x": 0.75, // 0.25 for Left Hand
+  "zoom_thresh_in": 0.05,
+  "orbit_sens_server": 3.0,
+  "use_fist_safety": true
+  // ... other props
 }
 ```
 
 ---
 
-## **6\. Implementation Phases**
+## **4. Functional Logic**
 
-**Phase 1: Comms Skeleton** → Create the Blender Add-on listener to verify it can receive data without crashing the UI.
+### A. Orbit (Virtual Joystick) and Deadzone
+We calculate the distance of the **Wrist** from a "Deadzone Center" (configurable).
+*   **Inside Deadzone:** No movement.
+*   **Outside Deadzone:** Movement speed increases linearly (clamped by Max Speed).
 
-**Phase 2: Vision Engine** → Build the external Python script to detect hands and output raw coordinates to the console.
+### B. Zoom (Discrete Trigger)
+We calculate the distance between **Thumb** and **Index** tips.
+*   **Distance < Threshold_In:** Zoom In.
+*   **Distance > Threshold_Out:** Zoom Out.
+*   **Between:** Idle (Hysteresis loop prevents jitter).
 
-**Phase 3: Integration & Math** → Connect the two. Convert raw coordinates into the JSON packet and implement **Exponential Moving Average (EMA)** smoothing in Blender to remove jitter.
+### C. Safety Locks
+1.  **Fist Lock:**
+    *   Logic: Checks average distance of Middle, Ring, and Pinky tips to Wrist.
+    *   If small (< 0.25), input is flagged as a "Fist".
+    *   Result: Zoom Orbit is ignored (Safety).
+2.  **Open Hand Lock:**
+    *   Logic: Checks if fingers are fully extended.
+    *   Result: Orbit is stopped (optional).
 
 ---
 
-## **7\. Directory Structure**
+## **5. Technology Stack**
+
+| Component | Technology | Role |
+| :---- | :---- | :---- |
+| **Server** | Python 3.10+ | Host Process |
+| **Vision** | MediaPipe Tasks | High-performance Hand Tracking |
+| **Video** | OpenCV | Webcam Capture & Visualization |
+| **Client** | Blender Python API | Add-on & Viewport Control |
+| **Comms** | UDP Sockets | IPC (Inter-Process Communication) |
+| **Persistence** | JSON | Saving user profiles to `~/.gesturenav_config.json` |
+
+---
+
+## **6. Directory Structure**
 
 ```
 GestureNav/
-├── assets/                     
-│   └── gesturenav_hero.png     
-├── client/                     # Blender Add-on Code
-├── server/                     # Python Computer Vision Code
-├── docs/                       
-│   ├── INSTALL.md              # Installation & Setup Guide
-│   ├── USER_MANUAL.md          # User Manual & Gesture Guide
-│   ├── ARCHITECTURE.md         # Technical Design Document
-│   └── ROADMAP.md              # Product Roadmap
-├── .gitignore                  
-├── LICENSE                     
-├── requirements.txt            # Python dependencies
-└── README.md
+├── assets/                 # Branding
+├── client/                 # Blender Add-on
+│   ├── __init__.py         # UI, Props, and Lifecycle
+│   └── operator_listen.py  # Modal Operator & Navigation Logic
+├── server/                 # Vision Server
+│   ├── main.py             # Entry Point (Threads & Logic)
+│   └── hand_landmarker.task # Model File
+├── docs/                   # Documentation
+└── README.md               # Overview
 ```
