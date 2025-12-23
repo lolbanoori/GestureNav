@@ -14,16 +14,17 @@ class GestureNav_OT_Start(bpy.types.Operator):
     
     _timer = None
     _sock = None
-    _last_zoom = None
     
-    # Sensitivities
-    ORBIT_SENSITIVITY = 0.05
-    ZOOM_SENSITIVITY = 10.0
+    # State for Smoothing (EMA)
+    _current_speed_x = 0.0
+    _current_speed_y = 0.0
+    
+    # Constants
+    ALPHA = 0.1  # Smoothing factor (Lower = Smoother)
     
     def modal(self, context, event):
         scene = context.scene
         
-        # Check if we should stop
         if not scene.gesturenav_listening:
             return self.cancel(context)
             
@@ -33,15 +34,16 @@ class GestureNav_OT_Start(bpy.types.Operator):
                 message = data.decode('utf-8')
                 try:
                     payload = json.loads(message)
-                    
                     if payload.get('state') == 'active':
                         self.process_navigation(context, payload)
                     else:
-                        self._last_zoom = None
+                        # Decay speed to 0 if hand is lost
+                        self.process_navigation(context, {'x': 0.0, 'y': 0.0, 'zoom': 0})
                         
                 except json.JSONDecodeError:
                     print(f"[GestureNav] Malformed JSON: {message}")
             except BlockingIOError:
+                # Still process navigation to handle smoothing decay even if no new packet
                 pass
             except Exception as e:
                 print(f"[GestureNav] Error: {e}")
@@ -49,65 +51,70 @@ class GestureNav_OT_Start(bpy.types.Operator):
         return {'PASS_THROUGH'}
         
     def find_view3d(self, context):
-        # Helper to find the 3D View area/region
         for area in context.screen.areas:
             if area.type == 'VIEW_3D':
                 for region in area.regions:
                     if region.type == 'WINDOW':
-                        space = area.spaces.active
-                        if space.type == 'VIEW_3D': 
-                             return area, region, space.region_3d
-        return None, None, None
+                        return area, region
+        return None, None
 
     def process_navigation(self, context, payload):
-        # Try current context first
+        # 1. State Update (EMA Smoothing)
+        target_x = payload.get('x', 0.0)
+        target_y = payload.get('y', 0.0)
+        
+        # Formula: current = (target * alpha) + (current * (1 - alpha))
+        self._current_speed_x = (target_x * self.ALPHA) + (self._current_speed_x * (1.0 - self.ALPHA))
+        self._current_speed_y = (target_y * self.ALPHA) + (self._current_speed_y * (1.0 - self.ALPHA))
+        
+        # 2. Context Setup
         area = context.area
         region = context.region
-        r3d = context.region_data
-
-        # Fallback: Search for the first 3D View
-        if not r3d or area.type != 'VIEW_3D':
-             area, region, r3d = self.find_view3d(context)
         
-        if not r3d:
-            return
-
-        # 1. ORBIT (Joystick Logic)
-        # Receive smoothed/processed velocity from server
-        ox = payload.get('x', 0.0)
-        oy = payload.get('y', 0.0)
+        if not area or area.type != 'VIEW_3D':
+            area, region = self.find_view3d(context)
+            
+        if not area:
+            return # Should probably log/print less frequently to avoid spam
+            
+        # Context Override for bpy.ops
+        override = {
+            'window': context.window,
+            'screen': context.screen,
+            'area': area,
+            'region': region,
+            'scene': context.scene,
+        }
         
-        if ox != 0 or oy != 0:
-            # Server already handled deadzone and sensitivity
-            # ox, oy are now "Velocity" values
-            
-            # Apply Rotation
-            rot_x = Quaternion((1, 0, 0), -oy * self.ORBIT_SENSITIVITY)
-            rot_z = Quaternion((0, 0, 1), -ox * self.ORBIT_SENSITIVITY)
-            
-            r3d.view_rotation = r3d.view_rotation @ rot_z @ rot_x
-            
-            if area: 
-                area.tag_redraw()
+        # 3. Apply Orbit (using bpy.ops)
+        # Threshold to avoid micro-movements (drift)
+        if abs(self._current_speed_x) > 0.001:
+            try:
+                # Note: Inverting X usually feels more natural for "Grab and Move" logic, 
+                # but User asked for simple mapping + "Invert if necessary".
+                # Standard Joystick: Right stick -> Camera rotates Right.
+                bpy.ops.view3d.view_orbit(override, angle=-self._current_speed_x, type='ORBITRIGHT')
+            except Exception:
+                pass
 
-        # 2. ZOOM (Discrete Logic)
-        # zoom is now -1 (Out), 0 (Idle), 1 (In)
+        if abs(self._current_speed_y) > 0.001:
+            try:
+                # Invert Y to match "Flight Sim" or "Joystick" (Up = Look Up)
+                bpy.ops.view3d.view_orbit(override, angle=self._current_speed_y, type='ORBITUP')
+            except Exception:
+                pass
+                
+        # 4. Apply Zoom
         zoom_state = payload.get('zoom', 0)
-        
         if zoom_state != 0:
-            # Zoom In (1) -> Decrease Distance
-            # Zoom Out (-1) -> Increase Distance
-            step = 0.1 * self.ZOOM_SENSITIVITY 
-            
-            # If Zoom In (1): subtract step
-            # If Zoom Out (-1): add step
-            # -1 * 1 * step = -step (In) ??? Wait.
-            # Zoom In (1) -> decrease distance.  distance -= 1 * step. Correct.
-            # Zoom Out (-1) -> increase distance. distance -= -1 * step = +step. Correct.
-            
-            r3d.view_distance -= zoom_state * step
-            
-            if area: area.tag_redraw()
+            try:
+                # zoom_state is 1 or -1. 
+                # bpy.ops.view3d.zoom(delta=1) -> Zoom In
+                # bpy.ops.view3d.zoom(delta=-1) -> Zoom Out
+                # User config: zoom=1 (In), zoom=-1 (Out) -> Matches.
+                bpy.ops.view3d.zoom(override, delta=int(zoom_state))
+            except Exception:
+                pass
 
     def invoke(self, context, event):
         scene = context.scene
@@ -127,6 +134,10 @@ class GestureNav_OT_Start(bpy.types.Operator):
         wm = context.window_manager
         self._timer = wm.event_timer_add(0.016, window=context.window)
         wm.modal_handler_add(self)
+        
+        # Reset state
+        self._current_speed_x = 0.0
+        self._current_speed_y = 0.0
         
         print("[GestureNav] Listener Started")
         return {'RUNNING_MODAL'}
