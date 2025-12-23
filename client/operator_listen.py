@@ -20,9 +20,6 @@ class GestureNav_OT_Start(bpy.types.Operator):
     _current_speed_y = 0.0
     
     # Constants
-    # Constants
-    ORBIT_SENSITIVITY = 0.02 # Drastically reduced for 60fps
-    ZOOM_SENSITIVITY = 2.0   # Multiplier for manual zoom step
     ALPHA = 0.1  # Smoothing factor (Lower = Smoother)
     
     def modal(self, context, event):
@@ -37,8 +34,6 @@ class GestureNav_OT_Start(bpy.types.Operator):
                 message = data.decode('utf-8')
                 try:
                     payload = json.loads(message)
-                    # print(f"Recv: {payload}") 
-                    
                     if payload.get('state') == 'active':
                         self.process_navigation(context, payload)
                     else:
@@ -80,12 +75,11 @@ class GestureNav_OT_Start(bpy.types.Operator):
                 print(f"[GestureNav] Op Error (Legacy API): {e}")
 
     def process_navigation(self, context, payload):
-        # print("DEBUG: Process Nav Running")
         # 1. State Update (EMA Smoothing)
         target_x = payload.get('x', 0.0)
         target_y = payload.get('y', 0.0)
         
-        r3d = None  # Defensive Initialization
+
         
         # Get Client Sensitivities
         orbit_sens = context.scene.gesturenav_orbit_sensitivity
@@ -110,7 +104,6 @@ class GestureNav_OT_Start(bpy.types.Operator):
             r3d = area.spaces.active.region_3d
             
         # Context Override for bpy.ops
-        # Note: 'window' and 'screen' are usually required for temp_override
         override = {
             'window': context.window,
             'screen': context.screen,
@@ -132,7 +125,6 @@ class GestureNav_OT_Start(bpy.types.Operator):
             # Step size per frame
             zoom_sens = context.scene.gesturenav_zoom_sensitivity
             step = 0.01 * zoom_sens
-            # print(f"ZOOM: State={zoom_state}, Sens={zoom_sens}, Step={step}, PrevDist={r3d.view_distance}")
             r3d.view_distance -= zoom_state * step
             if area: area.tag_redraw()
 

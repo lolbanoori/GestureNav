@@ -8,7 +8,7 @@ import math
 import time
 import os
 
-# State and Config (Global for simplicity in this script)
+# State and Config
 UDP_IP = "127.0.0.1"
 UDP_PORT = 5555
 MODEL_PATH = 'hand_landmarker.task'
@@ -46,8 +46,6 @@ def config_listener():
                 if key in config:
                     config[key] = value
             
-            # Debug: print updated config (optional, maybe too verbose)
-            # print(f"Config Updated: {config}")
             
         except BlockingIOError:
             time.sleep(0.1)
@@ -129,7 +127,7 @@ def main():
                 SENSITIVITY = config['orbit_sens_server']
                 MAX_SPEED = 0.5 
                 
-                # OPEN HAND SAFETY (Request 6)
+                # OPEN HAND SAFETY
                 # If palm is open/flat and safety enabled, disable orbit.
                 # Heuristic: Check fingers extended.
                 # Average distance of Middle(12), Ring(16), Pinky(20) from Wrist(0).

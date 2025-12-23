@@ -266,11 +266,7 @@ def register():
         name="Open Hand Safety", default=False, update=send_config
     )
 
-    # Auto-load logic (optional: try to load on reg if file exists)
-    # Using a timer to defer load until after registration is safer
-    def auto_load():
-        if os.path.exists(CONFIG_PATH):
-            pass
+
     
 def unregister():
     bpy.utils.unregister_class(GESTURENAV_PT_Panel)
