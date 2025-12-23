@@ -19,6 +19,7 @@
 
 </div>
 
+
 **GestureNav** is a professional tool that decouples computer vision from Blender's internal loop, allowing users to orbit and zoom the 3D viewport using hand gestures captured via a standard webcam.
 
 **v1.3 Update:** Now features a full **Configuration Dashboard** inside Blender, **Safety Locks**, and **Handedness Presets**!
