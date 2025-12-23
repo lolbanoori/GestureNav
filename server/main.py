@@ -77,9 +77,12 @@ def main():
                 # 1. ORBIT (Joystick Logic)
                 wrist = hand_landmarks[0]
                 
-                # Normalize to -0.5 to 0.5
-                raw_x = wrist.x - 0.5
-                raw_y = wrist.y - 0.5
+                # Offset Center (Move Deadzone to Right-Bottom side to clear view)
+                CENTER_X = 0.75
+                CENTER_Y = 0.6
+                
+                raw_x = wrist.x - CENTER_X
+                raw_y = wrist.y - CENTER_Y
                 
                 # Vector Magnitude
                 magnitude = math.sqrt(raw_x**2 + raw_y**2)
@@ -107,12 +110,14 @@ def main():
                 index = hand_landmarks[8]
                 dist = calculate_distance(thumb, index)
                 
-                PINCH_THRESHOLD = 0.05
+                # Widened Sweet Spot
+                PINCH_IN_THRESH = 0.04
+                PINCH_OUT_THRESH = 0.12
                 
-                if dist < PINCH_THRESHOLD:
+                if dist < PINCH_IN_THRESH:
                     zoom_val = 1  # Zoom In
                     cv2.putText(image, "ZOOM IN", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                elif dist > (PINCH_THRESHOLD * 2):
+                elif dist > PINCH_OUT_THRESH:
                     zoom_val = -1 # Zoom Out
                     cv2.putText(image, "ZOOM OUT", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
                 else:
@@ -129,7 +134,9 @@ def main():
             # Visualization
             h, w, _ = image.shape
             # Draw Deadzone
-            cv2.circle(image, (w//2, h//2), int(w * 0.15), (0, 255, 0), 1)
+            # Convert CENTER_X/Y to pixels
+            cx, cy = int(w * 0.75), int(h * 0.6)
+            cv2.circle(image, (cx, cy), int(w * 0.15), (0, 255, 0), 1)
             
             cv2.putText(image, f"Joy: {orbit_x:.2f}, {orbit_y:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
