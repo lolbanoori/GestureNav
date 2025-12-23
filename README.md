@@ -71,18 +71,17 @@ pip install -r requirements.txt
 
 # 2. Download MediaPipe Model
 python server/download_model.py
-
-# 3. Start the Server
-python server/main.py
 ```
-*You should see a webcam window appear.*
+
+**Then, simply double-click `start_server.bat` to launch!**
+*(Or run `python server/main.py` manually).*
 
 ### 2. Install the Blender Client
-1.  Open Blender.
-2.  Go to **Scripting** workspace.
-3.  Open `client/__init__.py`.
-4.  Click **Run Script** (Play icon).
-    *   *(Alternatively, zip the `client` folder and install as an Add-on)*.
+1.  **Zip** the `client` folder (Name it `GestureNav_Client.zip`).
+2.  **Drag and Drop** the zip file into Blender (or install via **Edit > Preferences > Add-ons**).
+3.  Enable the **GestureNav Client** add-on.
+
+> *Developers: You can still load `client/__init__.py` in the Scripting Workspace for testing.*
 
 ### 3. Start Navigating
 1.  In the 3D Viewport, press **N** to open the Sidebar.

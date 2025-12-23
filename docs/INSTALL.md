@@ -6,7 +6,7 @@
 </div>
 
 **GestureNav** uses a **Split Architecture**:
-1.  **The Server (External):** A Python script that watches your hand.
+1.  **The Server (External):** A program that watches your hand.
 2.  **The Client (Internal):** The Blender Add-on that moves your camera.
 
 **CRITICAL:** You must set up **both** parts.
@@ -21,9 +21,10 @@ This runs outside of Blender to keep your 3D viewport fast.
 You need Python **3.10** or **3.11** installed.
 *   **Check version:** `python --version`
 *   **Download:** [python.org](https://www.python.org/downloads/)
+    *   *Note: Check "Add Python to PATH" during installation.*
 
 ### 2. Install Dependencies
-Open your terminal in the `GestureNav/` folder:
+Open the `GestureNav` folder, type `cmd` in the address bar to open a terminal, and run:
 
 ```bash
 # Install MediaPipe, OpenCV, NumPy
@@ -31,32 +32,38 @@ pip install -r requirements.txt
 ```
 
 ### 3. Download the AI Model
-We need the specialized Hand Tracking model file from Google. Run this helper script:
+Run this command once to get the tracking file:
 
 ```bash
 python server/download_model.py
 ```
-*   *This will download `hand_landmarker.task` into the `server/` folder.*
 
-### 4. Test the Server
-Run the main engine:
-
-```bash
-python server/main.py
-```
+### 4. Start the Server (One-Click)
+Double-click `start_server.bat` in the GestureNav folder.
 *   Your webcam should turn on.
-*   You should see a window with your video feed.
-*   **Keep this window open** while using GestureNav.
+*   **Keep this black window open** while using GestureNav.
 
 ---
 
 ## **Part 2: Setting up the Blender Client**
 
-1.  **Open Blender** (3.0+).
-2.  Go to the **Scripting** tab (top menu).
-3.  Click **Open** and select `client/__init__.py`.
-4.  Click **Run Script** (Play icon).
-    *   *(Advanced Users: You can also zip the `client` folder and install it as a standard Add-on).*
+We install this just like any other Blender Add-on.
+
+### 1. Prepare the File
+1.  Zip the `client` folder (Right-click `client` -> Send to -> Compressed (zipped) folder).
+2.  Rename it to `GestureNav_Client.zip`.
+
+### 2. Install in Blender
+1.  Open Blender (3.0+).
+2.  Go to **Edit > Preferences**.
+3.  Click the **Add-ons** tab.
+4.  Click **Install...** (top right).
+5.  Select your `GestureNav_Client.zip`.
+6.  Check the box next to **GestureNav Client** to enable it.
+*Or you can simply drag and drop the `GestureNav_Client.zip` file into Blender.*
+
+> **For Developers:**
+> You can also open `client/__init__.py` in the **Scripting Workspace** and click Run Script to load it temporarily for editing.
 
 ---
 
@@ -72,15 +79,15 @@ python server/main.py
 ## **Part 4: Troubleshooting**
 
 ### **Issue: "ModuleNotFoundError: No module named 'mediapipe'"**
-This means you installed the libraries in a different Python environment than the one you are running.
+This means you installed the libraries in a different Python environment than the one `start_server.bat` is using.
 *   **Fix:** Try `python -m pip install -r requirements.txt`.
 
 ### **Issue: "ERROR: Model file not found"**
 You skipped **Step 3** in Part 1.
-*   **Fix:** Run `python server/download_model.py` or manually download `hand_landmarker.task` and place it in the `server/` folder.
+*   **Fix:** Run `python server/download_model.py`.
 
 ### **Issue: Blender isn't moving**
-1.  Is the Server running? (Black terminal window open?)
+1.  Is the Server running? (Black window open?)
 2.  Did you click "Start Listener" in Blender?
 3.  **Firewall:** Windows Defender might block the connection. Allow `python.exe` through the firewall.
 

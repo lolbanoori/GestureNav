@@ -98,13 +98,20 @@ We calculate the distance between **Thumb** and **Index** tips.
 
 ```
 GestureNav/
-├── assets/                 # Branding
-├── client/                 # Blender Add-on
-│   ├── __init__.py         # UI, Props, and Lifecycle
-│   └── operator_listen.py  # Modal Operator & Navigation Logic
-├── server/                 # Vision Server
-│   ├── main.py             # Entry Point (Threads & Logic)
-│   └── hand_landmarker.task # Model File
-├── docs/                   # Documentation
-└── README.md               # Overview
+├── assets/                     # Branding
+├── client/                     # Blender Add-on
+│   ├── __init__.py             # UI, Props, and Lifecycle
+│   └── operator_listen.py      # Modal Operator & Navigation Logic
+├── server/                     # Vision Server
+│   ├── main.py                 # Entry Point (Threads & Logic)
+│   └── hand_landmarker.task    # Model File
+├── docs/                       
+│   ├── INSTALL.md              # Installation & Setup Guide
+│   ├── USER_MANUAL.md          # User Manual & Gesture Guide
+│   ├── ARCHITECTURE.md         # Technical Design Document
+│   └── ROADMAP.md              # Product Roadmap
+├── .gitignore                  
+├── LICENSE                     
+├── requirements.txt            # Python dependencies
+└── README.md                   # Overview
 ```
