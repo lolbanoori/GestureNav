@@ -34,6 +34,8 @@ class GestureNav_OT_Start(bpy.types.Operator):
                 message = data.decode('utf-8')
                 try:
                     payload = json.loads(message)
+                    # print(f"Recv: {payload}") 
+                    
                     if payload.get('state') == 'active':
                         self.process_navigation(context, payload)
                     else:
@@ -58,6 +60,22 @@ class GestureNav_OT_Start(bpy.types.Operator):
                         return area, region
         return None, None
 
+    def run_ops(self, op, override, **kwargs):
+        """Execute a bpy.ops operator with context override safely across Blender versions."""
+        if hasattr(bpy.context, "temp_override"):
+            # Blender 3.2+
+            try:
+                with bpy.context.temp_override(**override):
+                    op(**kwargs)
+            except Exception as e:
+                print(f"[GestureNav] Op Error (New API): {e}")
+        else:
+            # Blender < 3.2
+            try:
+                op(override, **kwargs)
+            except Exception as e:
+                print(f"[GestureNav] Op Error (Legacy API): {e}")
+
     def process_navigation(self, context, payload):
         # 1. State Update (EMA Smoothing)
         target_x = payload.get('x', 0.0)
@@ -75,9 +93,10 @@ class GestureNav_OT_Start(bpy.types.Operator):
             area, region = self.find_view3d(context)
             
         if not area:
-            return # Should probably log/print less frequently to avoid spam
+            return
             
         # Context Override for bpy.ops
+        # Note: 'window' and 'screen' are usually required for temp_override
         override = {
             'window': context.window,
             'screen': context.screen,
@@ -86,35 +105,17 @@ class GestureNav_OT_Start(bpy.types.Operator):
             'scene': context.scene,
         }
         
-        # 3. Apply Orbit (using bpy.ops)
-        # Threshold to avoid micro-movements (drift)
+        # 3. Apply Orbit
         if abs(self._current_speed_x) > 0.001:
-            try:
-                # Note: Inverting X usually feels more natural for "Grab and Move" logic, 
-                # but User asked for simple mapping + "Invert if necessary".
-                # Standard Joystick: Right stick -> Camera rotates Right.
-                bpy.ops.view3d.view_orbit(override, angle=-self._current_speed_x, type='ORBITRIGHT')
-            except Exception:
-                pass
+            self.run_ops(bpy.ops.view3d.view_orbit, override, angle=-self._current_speed_x, type='ORBITRIGHT')
 
         if abs(self._current_speed_y) > 0.001:
-            try:
-                # Invert Y to match "Flight Sim" or "Joystick" (Up = Look Up)
-                bpy.ops.view3d.view_orbit(override, angle=self._current_speed_y, type='ORBITUP')
-            except Exception:
-                pass
+            self.run_ops(bpy.ops.view3d.view_orbit, override, angle=self._current_speed_y, type='ORBITUP')
                 
         # 4. Apply Zoom
         zoom_state = payload.get('zoom', 0)
         if zoom_state != 0:
-            try:
-                # zoom_state is 1 or -1. 
-                # bpy.ops.view3d.zoom(delta=1) -> Zoom In
-                # bpy.ops.view3d.zoom(delta=-1) -> Zoom Out
-                # User config: zoom=1 (In), zoom=-1 (Out) -> Matches.
-                bpy.ops.view3d.zoom(override, delta=int(zoom_state))
-            except Exception:
-                pass
+            self.run_ops(bpy.ops.view3d.zoom, override, delta=int(zoom_state))
 
     def invoke(self, context, event):
         scene = context.scene
