@@ -104,7 +104,7 @@ GestureNav/
 
 ---
 
-# Contributing
+## Contributing
 Contributions are welcome! Please read the Roadmap to see what features are currently planned.
 
 ---
