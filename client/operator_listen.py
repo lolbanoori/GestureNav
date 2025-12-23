@@ -20,6 +20,8 @@ class GestureNav_OT_Start(bpy.types.Operator):
     _current_speed_y = 0.0
     
     # Constants
+    ORBIT_SENSITIVITY = 0.5 # Client-side damper
+    ZOOM_SENSITIVITY = 0.5
     ALPHA = 0.1  # Smoothing factor (Lower = Smoother)
     
     def modal(self, context, event):
@@ -82,8 +84,8 @@ class GestureNav_OT_Start(bpy.types.Operator):
         target_y = payload.get('y', 0.0)
         
         # Formula: current = (target * alpha) + (current * (1 - alpha))
-        self._current_speed_x = (target_x * self.ALPHA) + (self._current_speed_x * (1.0 - self.ALPHA))
-        self._current_speed_y = (target_y * self.ALPHA) + (self._current_speed_y * (1.0 - self.ALPHA))
+        self._current_speed_x = ((target_x * self.ORBIT_SENSITIVITY) * self.ALPHA) + (self._current_speed_x * (1.0 - self.ALPHA))
+        self._current_speed_y = ((target_y * self.ORBIT_SENSITIVITY) * self.ALPHA) + (self._current_speed_y * (1.0 - self.ALPHA))
         
         # 2. Context Setup
         area = context.area

@@ -108,20 +108,35 @@ def main():
                 # 2. ZOOM (Discrete Trigger Logic)
                 thumb = hand_landmarks[4]
                 index = hand_landmarks[8]
-                dist = calculate_distance(thumb, index)
                 
-                # Widened Sweet Spot
-                PINCH_IN_THRESH = 0.04
-                PINCH_OUT_THRESH = 0.12
+                # FIST DETECTION (Safety)
+                # Check if Middle(12), Ring(16), Pinky(20) are closed.
+                # Distance from Wrist(0) to Tips.
+                # If all are small, it's a fist.
+                tips = [12, 16, 20]
+                avg_tip_dist = sum([calculate_distance(hand_landmarks[i], wrist) for i in tips]) / 3.0
                 
-                if dist < PINCH_IN_THRESH:
-                    zoom_val = 1  # Zoom In
-                    cv2.putText(image, "ZOOM IN", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                elif dist > PINCH_OUT_THRESH:
-                    zoom_val = -1 # Zoom Out
-                    cv2.putText(image, "ZOOM OUT", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
+                # Threshold found via testing usually ~0.2 for fist, >0.4 for open
+                IS_FIST = avg_tip_dist < 0.25
+                
+                if IS_FIST:
+                     zoom_val = 0
+                     cv2.putText(image, "FIST (ZOOM LOCKED)", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                 else:
-                    zoom_val = 0  # Idle
+                    dist = calculate_distance(thumb, index)
+                    
+                    # Widened/Easier Thresholds
+                    PINCH_IN_THRESH = 0.05  # Increased (Easier to trigger)
+                    PINCH_OUT_THRESH = 0.15 # Increased (Wider sweet spot)
+                    
+                    if dist < PINCH_IN_THRESH:
+                        zoom_val = 1  # Zoom In
+                        cv2.putText(image, "ZOOM IN", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                    elif dist > PINCH_OUT_THRESH:
+                        zoom_val = -1 # Zoom Out
+                        cv2.putText(image, "ZOOM OUT", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
+                    else:
+                        zoom_val = 0  # Idle
 
                 # Visualization Vectors
                 # Wrist to Index
