@@ -6,7 +6,7 @@
 <div align="center">
 
   <a href="https://github.com/lolbanoori/GestureNav/releases/tag/v1.3.1">
-    <img src="https://img.shields.io/badge/Download-v1.3.1-green?style=for-the-badge&logo=windows" alt="Download Release">
+    <img src="https://img.shields.io/badge/Download-v1.3.1-red?style=for-the-badge&logo=windows" alt="Download Release">
   </a>
 
   <a href="docs/INSTALL.md">
