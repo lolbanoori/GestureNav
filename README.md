@@ -3,11 +3,15 @@
 
 ![GestureNav Hero Image](assets/GestureNav_hero.png)
 
+<div align="center">
+[![Download Release](https://img.shields.io/badge/Download-v1.0-green?style=for-the-badge&logo=windows)](https://github.com/lolbanoori/GestureNav/releases/tag/v1.3.1)
+[![Get Started](https://img.shields.io/badge/Read-Docs-blue?style=for-the-badge)](docs/INSTALL.md)
+[![View Documentation](https://img.shields.io/badge/Read-Docs-blue?style=for-the-badge)](docs/USER_MANUAL.md)
+</div>
+
 **GestureNav** is a professional tool that decouples computer vision from Blender's internal loop, allowing users to orbit and zoom the 3D viewport using hand gestures captured via a standard webcam.
 
 **v1.3 Update:** Now features a full **Configuration Dashboard** inside Blender, **Safety Locks**, and **Handedness Presets**!
-
-By utilizing the "Puppeteer Pattern," GestureNav runs the heavy computer vision processing in a separate Python environment (Server) and broadcasts lightweight vector data to Blender (Client) via UDP. This ensures your 3D Viewport remains buttery smooth, even while tracking 21 hand landmarks in real-time.
 
 ---
 
