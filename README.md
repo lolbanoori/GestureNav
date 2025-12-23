@@ -9,7 +9,7 @@ By utilizing the "Puppeteer Pattern," GestureNav runs the heavy computer vision 
 
 ---
 
-## 🌟 Key Features
+## Key Features
 
 * **Zero-Lag Performance:** The vision engine runs independently, ensuring no frame drops in Blender.
 * **Intuitive Controls:**
@@ -21,7 +21,7 @@ By utilizing the "Puppeteer Pattern," GestureNav runs the heavy computer vision 
 
 ---
 
-## 📂 Documentation
+## Documentation
 
 We have detailed documentation available in the `docs/` folder to help you get started and understand the system architecture.
 
@@ -34,7 +34,7 @@ We have detailed documentation available in the `docs/` folder to help you get s
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 * **Blender:** Version 3.0 or higher.
@@ -68,7 +68,7 @@ python server/main.py
 
 ---
 
-# 🛠 Directory Structure
+# Directory Structure
 ```
 GestureNav/
 ├── assets/                 # Images and branding resources
@@ -81,10 +81,10 @@ GestureNav/
 
 ---
 
-# 🤝 Contributing
+# Contributing
 Contributions are welcome! Please read the Roadmap to see what features are currently planned.
 
 ---
 
-# ⚖️ License
+# License
 This project is licensed under the GNU General Public License v3.0. Because this project integrates with Blender's API, it adheres to the open-source spirit of the Blender ecosystem.
