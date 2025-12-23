@@ -66,7 +66,7 @@ def main():
             
             orbit_x = 0.0
             orbit_y = 0.0
-            zoom_dist = 0.0
+            zoom_val = 0
             state = "idle"
 
             # Parse Results
@@ -74,47 +74,73 @@ def main():
                 state = "active"
                 hand_landmarks = detection_result.hand_landmarks[0] # List of NormalizedLandmark
 
-                # 1. ORBIT (Wrist: 0)
+                # 1. ORBIT (Joystick Logic)
                 wrist = hand_landmarks[0]
+                
+                # Normalize to -0.5 to 0.5
                 raw_x = wrist.x - 0.5
                 raw_y = wrist.y - 0.5
                 
-                if abs(raw_x) > DEADZONE:
-                    orbit_x = raw_x
-                if abs(raw_y) > DEADZONE:
-                    orbit_y = raw_y
+                # Vector Magnitude
+                magnitude = math.sqrt(raw_x**2 + raw_y**2)
+                
+                # Joystick Math
+                DEADZONE_THRESH = 0.15
+                SENSITIVITY = 5.0
+                
+                if magnitude > DEADZONE_THRESH:
+                    # Normalize direction
+                    dir_x = raw_x / magnitude
+                    dir_y = raw_y / magnitude
+                    
+                    # Ramp up from 0
+                    strength = (magnitude - DEADZONE_THRESH) * SENSITIVITY
+                    
+                    orbit_x = dir_x * strength
+                    orbit_y = dir_y * strength
+                else:
+                    orbit_x = 0.0
+                    orbit_y = 0.0
 
-                # 2. ZOOM (Thumb 4, Index 8)
+                # 2. ZOOM (Discrete Trigger Logic)
                 thumb = hand_landmarks[4]
                 index = hand_landmarks[8]
-                zoom_dist = calculate_distance(thumb, index)
+                dist = calculate_distance(thumb, index)
                 
-                # Manual Drawing (since mp.solutions.drawing_utils is broken)
-                h, w, _ = image.shape
-                # Draw connections (subset for visuals)
+                PINCH_THRESHOLD = 0.05
+                
+                if dist < PINCH_THRESHOLD:
+                    zoom_val = 1  # Zoom In
+                    cv2.putText(image, "ZOOM IN", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                elif dist > (PINCH_THRESHOLD * 2):
+                    zoom_val = -1 # Zoom Out
+                    cv2.putText(image, "ZOOM OUT", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
+                else:
+                    zoom_val = 0  # Idle
+
+                # Visualization Vectors
                 # Wrist to Index
+                h, w, _ = image.shape
                 cv2.line(image, (int(wrist.x*w), int(wrist.y*h)), (int(index.x*w), int(index.y*h)), (0, 255, 255), 2)
-                # Wrist to Thumb
-                cv2.line(image, (int(wrist.x*w), int(wrist.y*h)), (int(thumb.x*w), int(thumb.y*h)), (0, 255, 255), 2)
                 
                 for lm in hand_landmarks:
                     cv2.circle(image, (int(lm.x * w), int(lm.y * h)), 4, (0, 0, 255), -1)
 
             # Visualization
             h, w, _ = image.shape
-            cv2.circle(image, (w//2, h//2), int(w * DEADZONE), (0, 255, 0), 1)
+            # Draw Deadzone
+            cv2.circle(image, (w//2, h//2), int(w * 0.15), (0, 255, 0), 1)
             
-            cv2.putText(image, f"Orbit: {orbit_x:.2f}, {orbit_y:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-            cv2.putText(image, f"Zoom: {zoom_dist:.2f}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+            cv2.putText(image, f"Joy: {orbit_x:.2f}, {orbit_y:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
             cv2.imshow('GestureNav Vision (Tasks)', image)
 
             # UDP Send
             payload = {
                 'state': state,
-                'orbit_x': orbit_x,
-                'orbit_y': orbit_y,
-                'zoom_dist': zoom_dist
+                'x': orbit_x,
+                'y': orbit_y,
+                'zoom': zoom_val
             }
             
             sock.sendto(json.dumps(payload).encode('utf-8'), (UDP_IP, UDP_PORT))

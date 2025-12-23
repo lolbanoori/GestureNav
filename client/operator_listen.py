@@ -70,37 +70,44 @@ class GestureNav_OT_Start(bpy.types.Operator):
              area, region, r3d = self.find_view3d(context)
         
         if not r3d:
-            # print("[GestureNav] Error: No 3D View found!")
             return
 
         # 1. ORBIT (Joystick Logic)
-        ox = payload.get('orbit_x', 0.0)
-        oy = payload.get('orbit_y', 0.0)
+        # Receive smoothed/processed velocity from server
+        ox = payload.get('x', 0.0)
+        oy = payload.get('y', 0.0)
         
         if ox != 0 or oy != 0:
-            # print(f"[GestureNav] Orbit: {ox:.3f}, {oy:.3f} | Region3D: {r3d}")
+            # Server already handled deadzone and sensitivity
+            # ox, oy are now "Velocity" values
             
+            # Apply Rotation
             rot_x = Quaternion((1, 0, 0), -oy * self.ORBIT_SENSITIVITY)
             rot_z = Quaternion((0, 0, 1), -ox * self.ORBIT_SENSITIVITY)
             
             r3d.view_rotation = r3d.view_rotation @ rot_z @ rot_x
             
-            # FORCE REDRAW
             if area: 
                 area.tag_redraw()
 
-        # 2. ZOOM (Delta Logic)
-        zoom_dist = payload.get('zoom_dist', 0.0)
+        # 2. ZOOM (Discrete Logic)
+        # zoom is now -1 (Out), 0 (Idle), 1 (In)
+        zoom_state = payload.get('zoom', 0)
         
-        if self._last_zoom is not None:
-            delta = zoom_dist - self._last_zoom
+        if zoom_state != 0:
+            # Zoom In (1) -> Decrease Distance
+            # Zoom Out (-1) -> Increase Distance
+            step = 0.1 * self.ZOOM_SENSITIVITY 
             
-            if abs(delta) > 0.002: 
-                # print(f"[GestureNav] Zoom Delta: {delta:.3f}")
-                r3d.view_distance -= delta * self.ZOOM_SENSITIVITY
-                if area: area.tag_redraw()
-                
-        self._last_zoom = zoom_dist
+            # If Zoom In (1): subtract step
+            # If Zoom Out (-1): add step
+            # -1 * 1 * step = -step (In) ??? Wait.
+            # Zoom In (1) -> decrease distance.  distance -= 1 * step. Correct.
+            # Zoom Out (-1) -> increase distance. distance -= -1 * step = +step. Correct.
+            
+            r3d.view_distance -= zoom_state * step
+            
+            if area: area.tag_redraw()
 
     def invoke(self, context, event):
         scene = context.scene
