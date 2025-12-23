@@ -90,7 +90,7 @@ def main():
                 # Joystick Math
                 DEADZONE_THRESH = 0.12 # Smaller deadzone
                 SENSITIVITY = 3.0      # Lower sensitivity
-                MAX_SPEED = 1.0        # Cap maximum speed
+                MAX_SPEED = 0.5        # Cap maximum speed (slower cap)
                 
                 if magnitude > DEADZONE_THRESH:
                     # Normalize direction

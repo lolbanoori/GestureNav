@@ -20,8 +20,9 @@ class GestureNav_OT_Start(bpy.types.Operator):
     _current_speed_y = 0.0
     
     # Constants
-    ORBIT_SENSITIVITY = 0.5 # Client-side damper
-    ZOOM_SENSITIVITY = 0.5
+    # Constants
+    ORBIT_SENSITIVITY = 0.02 # Drastically reduced for 60fps
+    ZOOM_SENSITIVITY = 2.0   # Multiplier for manual zoom step
     ALPHA = 0.1  # Smoothing factor (Lower = Smoother)
     
     def modal(self, context, event):
@@ -114,10 +115,13 @@ class GestureNav_OT_Start(bpy.types.Operator):
         if abs(self._current_speed_y) > 0.001:
             self.run_ops(bpy.ops.view3d.view_orbit, override, angle=self._current_speed_y, type='ORBITUP')
                 
-        # 4. Apply Zoom
+        # 4. Apply Zoom (Manual Distance for Smoothness)
         zoom_state = payload.get('zoom', 0)
         if zoom_state != 0:
-            self.run_ops(bpy.ops.view3d.zoom, override, delta=int(zoom_state))
+            # Step size per frame (approx 0.02 units at Sens=2.0)
+            step = 0.01 * self.ZOOM_SENSITIVITY
+            r3d.view_distance -= zoom_state * step
+            if area: area.tag_redraw()
 
     def invoke(self, context, event):
         scene = context.scene
