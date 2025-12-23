@@ -84,9 +84,12 @@ class GestureNav_OT_Start(bpy.types.Operator):
         target_x = payload.get('x', 0.0)
         target_y = payload.get('y', 0.0)
         
+        # Get Client Sensitivities
+        orbit_sens = context.scene.gesturenav_orbit_sensitivity
+        
         # Formula: current = (target * alpha) + (current * (1 - alpha))
-        self._current_speed_x = ((target_x * self.ORBIT_SENSITIVITY) * self.ALPHA) + (self._current_speed_x * (1.0 - self.ALPHA))
-        self._current_speed_y = ((target_y * self.ORBIT_SENSITIVITY) * self.ALPHA) + (self._current_speed_y * (1.0 - self.ALPHA))
+        self._current_speed_x = ((target_x * orbit_sens) * self.ALPHA) + (self._current_speed_x * (1.0 - self.ALPHA))
+        self._current_speed_y = ((target_y * orbit_sens) * self.ALPHA) + (self._current_speed_y * (1.0 - self.ALPHA))
         
         # 2. Context Setup
         area = context.area
@@ -118,8 +121,9 @@ class GestureNav_OT_Start(bpy.types.Operator):
         # 4. Apply Zoom (Manual Distance for Smoothness)
         zoom_state = payload.get('zoom', 0)
         if zoom_state != 0:
-            # Step size per frame (approx 0.02 units at Sens=2.0)
-            step = 0.01 * self.ZOOM_SENSITIVITY
+            # Step size per frame
+            zoom_sens = context.scene.gesturenav_zoom_sensitivity
+            step = 0.01 * zoom_sens
             r3d.view_distance -= zoom_state * step
             if area: area.tag_redraw()
 

@@ -8,14 +8,53 @@ import math
 import time
 import os
 
-# Configuration
+# State and Config (Global for simplicity in this script)
 UDP_IP = "127.0.0.1"
 UDP_PORT = 5555
-DEADZONE = 0.1
 MODEL_PATH = 'hand_landmarker.task'
 
-def calculate_distance(p1, p2):
-    return math.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2)
+config = {
+    'deadzone_radius': 0.12,
+    'deadzone_offset_x': 0.75,
+    'deadzone_offset_y': 0.6,
+    'zoom_thresh_in': 0.05,
+    'zoom_thresh_out': 0.15,
+    'orbit_sens_server': 3.0,
+    'use_fist_safety': True,
+    'use_open_hand_safety': False
+}
+
+def config_listener():
+    """Listens for configuration updates from Blender on Port 5556."""
+    UDP_PORT_CONFIG = 5556
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        sock.bind((UDP_IP, UDP_PORT_CONFIG))
+        sock.setblocking(False)
+        print(f"Config Listener started on port {UDP_PORT_CONFIG}")
+    except Exception as e:
+        print(f"Config Listener Error: {e}")
+        return
+
+    while True:
+        try:
+            data, addr = sock.recvfrom(1024)
+            new_config = json.loads(data.decode('utf-8'))
+            
+            # Update global config safely
+            for key, value in new_config.items():
+                if key in config:
+                    config[key] = value
+            
+            # Debug: print updated config (optional, maybe too verbose)
+            # print(f"Config Updated: {config}")
+            
+        except BlockingIOError:
+            time.sleep(0.1)
+        except Exception as e:
+            print(f"Config Parse Error: {e}")
+
+import threading
 
 def main():
     print(f"Starting GestureNav Vision Engine (Tasks API) on {UDP_IP}:{UDP_PORT}")
@@ -23,6 +62,10 @@ def main():
     if not os.path.exists(MODEL_PATH):
         print(f"ERROR: Model file {MODEL_PATH} not found. Please download it.")
         return
+
+    # Start Config Thread
+    cfg_thread = threading.Thread(target=config_listener, daemon=True)
+    cfg_thread.start()
 
     # Initialize UDP
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -37,11 +80,6 @@ def main():
         min_tracking_confidence=0.5)
     detector = vision.HandLandmarker.create_from_options(options)
 
-    # Note: Drawing utils might still be in mp.solutions.drawing_utils? 
-    # If solutions is missing, we might have to draw manually or use mp.tasks visualization tools?
-    # Actually, mp.solutions might NOT be available at all. 
-    # I will write a simple manual drawer to be safe.
-    
     cap = cv2.VideoCapture(0)
     
     start_time = time.time()
@@ -55,14 +93,10 @@ def main():
             image = cv2.flip(image, 1)
             rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             
-            # Create MP Image
             mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
             
-            # Detect
             timestamp_ms = int((time.time() - start_time) * 1000)
-            detection_result = detector.detect(mp_image) # Using image mode for simplicity (or detect_for_video)
-            # For video mode: detector.detect_for_video(mp_image, timestamp_ms)
-            # Let's use detect() (Image mode) first as it doesn't require strict monotonic timestamps, simpler for debugging.
+            detection_result = detector.detect(mp_image)
             
             orbit_x = 0.0
             orbit_y = 0.0
@@ -72,35 +106,46 @@ def main():
             # Parse Results
             if detection_result.hand_landmarks:
                 state = "active"
-                hand_landmarks = detection_result.hand_landmarks[0] # List of NormalizedLandmark
+                hand_landmarks = detection_result.hand_landmarks[0]
 
                 # 1. ORBIT (Joystick Logic)
                 wrist = hand_landmarks[0]
                 
-                # Offset Center (Move Deadzone to Right-Bottom side to clear view)
-                CENTER_X = 0.75
-                CENTER_Y = 0.6
+                # Dynamic Deadzone Position
+                cx = config['deadzone_offset_x']
+                cy = config['deadzone_offset_y']
                 
-                raw_x = wrist.x - CENTER_X
-                raw_y = wrist.y - CENTER_Y
+                raw_x = wrist.x - cx
+                raw_y = wrist.y - cy
                 
                 # Vector Magnitude
                 magnitude = math.sqrt(raw_x**2 + raw_y**2)
                 
-                # Joystick Math
-                DEADZONE_THRESH = 0.12 # Smaller deadzone
-                SENSITIVITY = 3.0      # Lower sensitivity
-                MAX_SPEED = 0.5        # Cap maximum speed (slower cap)
+                # Dynamic Thresholds
+                DEADZONE_THRESH = config['deadzone_radius']
+                SENSITIVITY = config['orbit_sens_server']
+                MAX_SPEED = 0.5 
                 
-                if magnitude > DEADZONE_THRESH:
-                    # Normalize direction
+                # OPEN HAND SAFETY (Request 6)
+                # If palm is open/flat and safety enabled, disable orbit.
+                # Heuristic: Check fingers extended.
+                # Average distance of Middle(12), Ring(16), Pinky(20) from Wrist(0).
+                # If large (>0.35 approx), handle is "Open".
+                tips = [12, 16, 20]
+                avg_tip_dist = sum([calculate_distance(hand_landmarks[i], wrist) for i in tips]) / 3.0
+                IS_OPEN = avg_tip_dist > 0.35
+                IS_FIST = avg_tip_dist < 0.25
+                
+                ORBIT_ALLOWED = True
+                if config['use_open_hand_safety'] and IS_OPEN:
+                    ORBIT_ALLOWED = False
+                    cv2.putText(image, "OPEN HAND (ORBIT LOCKED)", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
+                
+                if magnitude > DEADZONE_THRESH and ORBIT_ALLOWED:
                     dir_x = raw_x / magnitude
                     dir_y = raw_y / magnitude
                     
-                    # Ramp up from 0
                     raw_strength = (magnitude - DEADZONE_THRESH) * SENSITIVITY
-                    
-                    # Clamp and Smoothen (Simple Linear for now, but capped)
                     strength = min(raw_strength, MAX_SPEED)
                     
                     orbit_x = dir_x * strength
@@ -109,41 +154,31 @@ def main():
                     orbit_x = 0.0
                     orbit_y = 0.0
 
-                # 2. ZOOM (Discrete Trigger Logic)
+                # 2. ZOOM
                 thumb = hand_landmarks[4]
                 index = hand_landmarks[8]
                 
-                # FIST DETECTION (Safety)
-                # Check if Middle(12), Ring(16), Pinky(20) are closed.
-                # Distance from Wrist(0) to Tips.
-                # If all are small, it's a fist.
-                tips = [12, 16, 20]
-                avg_tip_dist = sum([calculate_distance(hand_landmarks[i], wrist) for i in tips]) / 3.0
-                
-                # Threshold found via testing usually ~0.2 for fist, >0.4 for open
-                IS_FIST = avg_tip_dist < 0.25
-                
-                if IS_FIST:
-                     zoom_val = 0
+                ZOOM_ALLOWED = True
+                if config['use_fist_safety'] and IS_FIST:
+                     ZOOM_ALLOWED = False
                      cv2.putText(image, "FIST (ZOOM LOCKED)", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                else:
+                
+                if ZOOM_ALLOWED:
                     dist = calculate_distance(thumb, index)
                     
-                    # Widened/Easier Thresholds
-                    PINCH_IN_THRESH = 0.05  # Increased (Easier to trigger)
-                    PINCH_OUT_THRESH = 0.15 # Increased (Wider sweet spot)
+                    PINCH_IN = config['zoom_thresh_in']
+                    PINCH_OUT = config['zoom_thresh_out']
                     
-                    if dist < PINCH_IN_THRESH:
-                        zoom_val = 1  # Zoom In
+                    if dist < PINCH_IN:
+                        zoom_val = 1
                         cv2.putText(image, "ZOOM IN", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                    elif dist > PINCH_OUT_THRESH:
-                        zoom_val = -1 # Zoom Out
+                    elif dist > PINCH_OUT:
+                        zoom_val = -1
                         cv2.putText(image, "ZOOM OUT", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
                     else:
-                        zoom_val = 0  # Idle
+                        zoom_val = 0
 
                 # Visualization Vectors
-                # Wrist to Index
                 h, w, _ = image.shape
                 cv2.line(image, (int(wrist.x*w), int(wrist.y*h)), (int(index.x*w), int(index.y*h)), (0, 255, 255), 2)
                 
@@ -152,10 +187,11 @@ def main():
 
             # Visualization
             h, w, _ = image.shape
-            # Draw Deadzone
-            # Convert CENTER_X/Y to pixels
-            cx, cy = int(w * 0.75), int(h * 0.6)
-            cv2.circle(image, (cx, cy), int(w * 0.12), (0, 255, 0), 1)
+            
+            # Dynamic Deadzone Visual
+            dcx, dcy = int(w * config['deadzone_offset_x']), int(h * config['deadzone_offset_y'])
+            dr = int(w * config['deadzone_radius'])
+            cv2.circle(image, (dcx, dcy), dr, (0, 255, 0), 1)
             
             cv2.putText(image, f"Joy: {orbit_x:.2f}, {orbit_y:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
