@@ -88,8 +88,9 @@ def main():
                 magnitude = math.sqrt(raw_x**2 + raw_y**2)
                 
                 # Joystick Math
-                DEADZONE_THRESH = 0.15
-                SENSITIVITY = 5.0
+                DEADZONE_THRESH = 0.12 # Smaller deadzone
+                SENSITIVITY = 3.0      # Lower sensitivity
+                MAX_SPEED = 1.0        # Cap maximum speed
                 
                 if magnitude > DEADZONE_THRESH:
                     # Normalize direction
@@ -97,7 +98,10 @@ def main():
                     dir_y = raw_y / magnitude
                     
                     # Ramp up from 0
-                    strength = (magnitude - DEADZONE_THRESH) * SENSITIVITY
+                    raw_strength = (magnitude - DEADZONE_THRESH) * SENSITIVITY
+                    
+                    # Clamp and Smoothen (Simple Linear for now, but capped)
+                    strength = min(raw_strength, MAX_SPEED)
                     
                     orbit_x = dir_x * strength
                     orbit_y = dir_y * strength
@@ -151,7 +155,7 @@ def main():
             # Draw Deadzone
             # Convert CENTER_X/Y to pixels
             cx, cy = int(w * 0.75), int(h * 0.6)
-            cv2.circle(image, (cx, cy), int(w * 0.15), (0, 255, 0), 1)
+            cv2.circle(image, (cx, cy), int(w * 0.12), (0, 255, 0), 1)
             
             cv2.putText(image, f"Joy: {orbit_x:.2f}, {orbit_y:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
