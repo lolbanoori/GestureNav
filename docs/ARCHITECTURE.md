@@ -1,5 +1,5 @@
 # **GestureNav Architecture**
-> **Technical Design Document (v1.3)**
+> **Technical Design Document (v1.5)**
 
 ## **1. Executive Summary**
 
@@ -79,6 +79,9 @@ We calculate the distance between **Thumb** and **Index** tips.
     *   Logic: Checks if fingers are fully extended.
     *   Result: Orbit is stopped (optional).
 
+### D. System Integrity
+*   **Graceful Shutdown:** The server loop checks for multiple exit signals (window close event, 'Q' key, 'Esc' key) to ensure sockets are closed and cameras released properly to avoid resource leaks.
+
 ---
 
 ## **5. Technology Stack**
@@ -110,8 +113,10 @@ GestureNav/
 │   ├── USER_MANUAL.md          # User Manual & Gesture Guide
 │   ├── ARCHITECTURE.md         # Technical Design Document
 │   └── ROADMAP.md              # Product Roadmap
+├── .gitattributes
 ├── .gitignore                  
 ├── LICENSE                     
+├── start_server.bat            # One-Click Launcher
 ├── requirements.txt            # Python dependencies
 └── README.md                   # Overview
 ```

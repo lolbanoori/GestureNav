@@ -13,17 +13,27 @@
 
 ---
 
-## **Phase 2: The "Virtuoso" Update (v1.5)**
+## **Phase 2: The Polish Update (v1.5) [COMPLETED]**
 
-*Focus: Completing the Navigation Suite*
+*Focus: User Experience & Reliability*
 
-*   [ ] **Feature: Panning (Strafe).** Implementation of the "Open Palm" gesture to move the view laterally.
-*   [ ] **Feature: View Snapping.** High-velocity "Swipes" to snap to Front/Side/Top views.
-*   [ ] **Feature: Focus Selected.** "Double Pinch" gesture to trigger `Numpad .` (Center view on object).
+*   [x] **Graceful Shutdown:** Clean exit via 'Q', 'Esc', or Window Close.
+*   [x] **One-Click Launcher:** Auto-install dependencies and model.
+*   [x] **Robust Configuration:** Persistence and Handedness presets.
 
 ---
 
-## **Phase 3: Advanced Control (v2.0)**
+## **Phase 3: The "Virtuoso" Update (v2.0)**
+
+*Focus: Advanced Control*
+
+*   [ ] **Feature: Panning (Strafe).** "Open Palm" gesture to move view laterally.
+*   [ ] **Feature: View Snapping.** "Swipes" to snap to Front/Side/Top views.
+*   [ ] **Feature: Focus Selected.** "Double Pinch" to center view.
+
+---
+
+## **Phase 3: Advanced Control (v3.0)**
 
 *Focus: Beyond Navigation*
 

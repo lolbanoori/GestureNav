@@ -5,8 +5,8 @@
 
 <div align="center">
 
-  <a href="https://github.com/lolbanoori/GestureNav/releases/tag/v1.3.1">
-    <img src="https://img.shields.io/badge/Download-v1.3.1-red?style=for-the-badge&logo=windows" alt="Download Release">
+  <a href="https://github.com/lolbanoori/GestureNav/releases/tag/v1.5">
+    <img src="https://img.shields.io/badge/Download-v1.5-red?style=for-the-badge&logo=windows" alt="Download Release">
   </a>
 
   <a href="docs/INSTALL.md">
@@ -22,7 +22,7 @@
 
 **GestureNav** is a professional tool that decouples computer vision from Blender's internal loop, allowing users to orbit and zoom the 3D viewport using hand gestures captured via a standard webcam.
 
-**v1.3 Update:** Now features a full **Configuration Dashboard** inside Blender, **Safety Locks**, and **Handedness Presets**!
+**v1.5 Update:** Now features **Graceful Shutdown**, a **One-Click Launcher**, and a polished **Configuration Dashboard**!
 
 ---
 
@@ -32,7 +32,8 @@
 *   **Intuitive Controls:**
     *   **Virtual Joystick Orbit:** Move your hand from the center to orbit. The further you reach, the faster it spins.
     *   **Zoom:** **Pinch** your fingers to zoom in, **Spread** to zoom out.
-*   **Safety Locks:**
+*   **Safety & UX:**
+    *   **Graceful Shutdown:** Close the server cleanly with **'Q'**, **'Esc'**, or the Window **'X'**.
     *   **Fist Lock:** Make a fist to disable Zoom (useful for repositioning your hand).
     *   **Open Hand Lock:** Open your palm flat to disable Orbit (optional).
 *   **Configuration Dashboard:**
@@ -104,6 +105,9 @@ GestureNav/
 ├── client/                  # Blender Add-on source code
 ├── server/                  # Python Computer Vision source code
 ├── docs/                    # Full project documentation
+├── .gitattributes
+├── .gitignore
+├── start_server.bat         # One-Click Launcher
 ├── requirements.txt         # Python dependencies
 └── README.md                # You are here
 ```

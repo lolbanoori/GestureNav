@@ -49,6 +49,18 @@ Sometimes you need to reposition your hand without moving the camera.
 
 ---
 
+## **Quick Reference (Controls)**
+
+| Gesture | Action | Visual Feedback (Server) |
+| :--- | :--- | :--- |
+| **Neutral Hand** | **Stop / Idle** | Hand tracked, Cursor in Green Circle. |
+| **Move Hand** | **Orbit Camera** | Cursor leaves Green Circle. |
+| **Pinch Fingers** | **Zoom In** | Text "ZOOM IN" (Red). |
+| **Spread Fingers** | **Zoom Out** | Text "ZOOM OUT" (Blue). |
+| **Make a Fist** | **Lock Zoom** | Text "FIST (ZOOM LOCKED)". |
+
+---
+
 ## **3. The Configuration Dashboard**
 
 Located in the Blender Sidebar (N-Panel) > **GestureNav** tab.
@@ -85,3 +97,9 @@ If the camera is drifting, look at the server window. bring your hand back to th
 *   **View Spinning Uncontrollably?** → You are outside the "Deadzone." Center your hand.
 *   **Zoom Jumping?** → Your lighting is too dim; the camera can't see your fingertips clearly.
 *   **Can't Connect?** → Ensure you ran `start_server.bat` (or `python server/main.py`) **before** clicking start in Blender.
+*   **Camera does not move?** → Ensure "Start Listener" is clicked in Blender AND the Python Server window is open.
+*   **Crashes with `NameError`?** → Ensure you are running the latest version of the scripts.
+
+---
+**Author**: Zohair Banoori
+**Version**: 1.5
