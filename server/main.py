@@ -11,7 +11,10 @@ import os
 # State and Config
 UDP_IP = "127.0.0.1"
 UDP_PORT = 5555
-MODEL_PATH = 'hand_landmarker.task'
+MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'hand_landmarker.task')
+
+# GUI State for Termination
+stop_server = False
 
 config = {
     'deadzone_radius': 0.12,
@@ -37,6 +40,8 @@ def config_listener():
         return
 
     while True:
+        if stop_server:
+            break
         try:
             data, addr = sock.recvfrom(1024)
             new_config = json.loads(data.decode('utf-8'))
@@ -51,6 +56,8 @@ def config_listener():
             time.sleep(0.1)
         except Exception as e:
             print(f"Config Parse Error: {e}")
+            
+    sock.close()
 
 import threading
 
@@ -58,6 +65,7 @@ def calculate_distance(p1, p2):
     return math.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2)
 
 def main():
+    global stop_server
     print(f"Starting GestureNav Vision Engine (Tasks API) on {UDP_IP}:{UDP_PORT}")
 
     if not os.path.exists(MODEL_PATH):
@@ -83,10 +91,23 @@ def main():
 
     cap = cv2.VideoCapture(0)
     
+    # Setup Window
+    cv2.namedWindow('GestureNav Vision (Tasks)')
+    
     start_time = time.time()
 
     try:
         while cap.isOpened():
+            # Check for Window Close (X button)
+            try:
+                if cv2.getWindowProperty('GestureNav Vision (Tasks)', cv2.WND_PROP_VISIBLE) < 1:
+                    stop_server = True
+            except:
+                pass # Window might not be created yet
+
+            if stop_server:
+                break
+
             success, image = cap.read()
             if not success:
                 continue
@@ -208,7 +229,9 @@ def main():
             
             sock.sendto(json.dumps(payload).encode('utf-8'), (UDP_IP, UDP_PORT))
             
-            if cv2.waitKey(5) & 0xFF == 27:
+            key = cv2.waitKey(5) & 0xFF
+            if key == 27 or key == ord('q') or key == ord('Q'):
+                stop_server = True
                 break
 
     except KeyboardInterrupt:
@@ -216,6 +239,7 @@ def main():
     except Exception as e:
         print(f"Error: {e}")
     finally:
+        stop_server = True # Ensure thread stops
         cap.release()
         cv2.destroyAllWindows()
         sock.close()

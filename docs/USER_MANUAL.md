@@ -11,6 +11,34 @@ This guide will teach you the **Safety Clutch**, the **Gesture Dictionary**, and
 
 ---
 
+<<<<<<< Updated upstream
+=======
+## **Getting Started**
+
+### **Prerequisites**
+*   Blender 3.0 or higher (Tested on 4.5).
+*   Python (3.10+) installed on your system.
+
+### **Running the System**
+You need to run two components: the **Vision Server** (Brain) and the **Blender Client** (Body).
+
+#### **Step A: Limitless Power (Server)**
+1.  **Launch:** Double-click `start_server.bat`.
+    *   *It will automatically install AI libraries and download the model if needed.*
+    *   *A webcam window should appear.*
+2.  **Stop:** To close it, click the window's **"X"** or press **'Q'** / **'Esc'**.
+
+#### **Step B: The Interface (Client)**
+1.  **Zip** the `client` folder.
+2.  **Drag and Drop** the zip file into Blender (or install via **Edit > Preferences > Add-ons**).
+3.  Enable **GestureNav Client**.
+4.  In the 3D Viewport, press **N** to open the Sidebar.
+5.  Click the **GestureNav** tab.
+6.  Click **Start Listener**.
+
+---
+
+>>>>>>> Stashed changes
 ## **1. The "Clutch" Concept (Safety First)**
 
 Imagine driving a car. You don't want the car to move every time you bump the steering wheel while parked. GestureNav works the same way.
