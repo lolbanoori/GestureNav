@@ -23,25 +23,17 @@ You need Python **3.10** or **3.11** installed.
 *   **Download:** [python.org](https://www.python.org/downloads/)
     *   *Note: Check "Add Python to PATH" during installation.*
 
-### 2. Install Dependencies
-Open the `GestureNav` folder, type `cmd` in the address bar to open a terminal, and run:
+### 2. Start the Server (One-Click Setup)
+Since you are on Windows, we have a smart launcher for you!
 
-```bash
-# Install MediaPipe, OpenCV, NumPy
-pip install -r requirements.txt
-```
+1.  **Double-click** `start_server.bat` in the GestureNav folder.
+2.  It will automatically:
+    *   Check for Python.
+    *   **Install necessary libraries** (MediaPipe, OpenCV, etc.) if missing.
+    *   **Download the AI Model** if missing.
+    *   Start the Vision Engine.
 
-### 3. Download the AI Model
-Run this command once to get the tracking file:
-
-```bash
-python server/download_model.py
-```
-
-### 4. Start the Server (One-Click)
-Double-click `start_server.bat` in the GestureNav folder.
-*   Your webcam should turn on.
-*   **Keep this black window open** while using GestureNav.
+*   *Note: If you are on Linux/Mac, or prefer manual control, run `pip install -r requirements.txt` and `python server/main.py` manually.*
 
 ---
 
