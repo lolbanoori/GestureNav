@@ -24,7 +24,7 @@ You need to run two components: the **Vision Server** (Brain) and the **Blender 
 1.  **Launch:** Double-click `start_server.bat`.
     *   *It will automatically install AI libraries and download the model if needed.*
     *   *A webcam window should appear.*
-2.  **Stop:** To close it, click the red **"STOP"** button, the window's **"X"**, or press **'Q'**.
+2.  **Stop:** To close it, click the window's **"X"** or press **'Q'** / **'Esc'**.
 
 #### **Step B: The Interface (Client)**
 1.  **Zip** the `client` folder.
@@ -36,6 +36,7 @@ You need to run two components: the **Vision Server** (Brain) and the **Blender 
 
 ---
 
+=======
 ## **1. The "Clutch" Concept (Safety First)**
 
 Imagine driving a car. You don't want the car to move every time you bump the steering wheel while parked. GestureNav works the same way.
