@@ -1,7 +1,7 @@
 bl_info = {
     "name": "GestureNav Client",
     "author": "Zohair Banoori",
-    "version": (1, 3),
+    "version": (1, 5),
     "blender": (3, 0, 0),
     "location": "View3D > Sidebar > GestureNav",
     "description": "UDP Client for GestureNav Vision Server",
