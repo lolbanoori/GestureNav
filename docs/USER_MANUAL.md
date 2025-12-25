@@ -11,8 +11,6 @@ This guide will teach you the **Safety Clutch**, the **Gesture Dictionary**, and
 
 ---
 
-<<<<<<< Updated upstream
-=======
 ## **Getting Started**
 
 ### **Prerequisites**
@@ -38,7 +36,7 @@ You need to run two components: the **Vision Server** (Brain) and the **Blender 
 
 ---
 
->>>>>>> Stashed changes
+=======
 ## **1. The "Clutch" Concept (Safety First)**
 
 Imagine driving a car. You don't want the car to move every time you bump the steering wheel while parked. GestureNav works the same way.
@@ -74,6 +72,18 @@ GestureNav puts a "Deadzone Circle" in the center of your camera view.
 Sometimes you need to reposition your hand without moving the camera.
 *   **Fist Lock (Zoom):** Make a tight **Fist**. This disables the Zoom engine. Use this to move your hand back to a comfortable position without accidentally zooming in/out.
 *   **Open Hand Lock (Orbit):** (Optional) If enabled in settings, opening your hand flat will stop the Orbit rotation.
+
+---
+
+## **Quick Reference (Controls)**
+
+| Gesture | Action | Visual Feedback (Server) |
+| :--- | :--- | :--- |
+| **Neutral Hand** | **Stop / Idle** | Hand tracked, Cursor in Green Circle. |
+| **Move Hand** | **Orbit Camera** | Cursor leaves Green Circle. |
+| **Pinch Fingers** | **Zoom In** | Text "ZOOM IN" (Red). |
+| **Spread Fingers** | **Zoom Out** | Text "ZOOM OUT" (Blue). |
+| **Make a Fist** | **Lock Zoom** | Text "FIST (ZOOM LOCKED)". |
 
 ---
 
@@ -113,3 +123,9 @@ If the camera is drifting, look at the server window. bring your hand back to th
 *   **View Spinning Uncontrollably?** → You are outside the "Deadzone." Center your hand.
 *   **Zoom Jumping?** → Your lighting is too dim; the camera can't see your fingertips clearly.
 *   **Can't Connect?** → Ensure you ran `start_server.bat` (or `python server/main.py`) **before** clicking start in Blender.
+*   **Camera does not move?** → Ensure "Start Listener" is clicked in Blender AND the Python Server window is open.
+*   **Crashes with `NameError`?** → Ensure you are running the latest version of the scripts.
+
+---
+**Author**: Zohair Banoori
+**Version**: 1.4
