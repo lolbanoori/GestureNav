@@ -63,18 +63,12 @@ We have detailed documentation available in the `docs/` folder to help you get s
 *   **Webcam:** Any standard laptop or USB webcam.
 
 ### 1. Set up the Vision Server
-Open your terminal in the project folder:
+**Double-click `start_server.bat`!**
 
-```bash
-# 1. Install dependencies
-pip install -r requirements.txt
+*   It will automatically install requirements and download the AI model for you.
+*   *You should see a webcam window appear.*
 
-# 2. Download MediaPipe Model
-python server/download_model.py
-```
-
-**Then, simply double-click `start_server.bat` to launch!**
-*(Or run `python server/main.py` manually).*
+*(Linux/Mac users: Run `pip install -r requirements.txt` then `python server/main.py`)*
 
 ### 2. Install the Blender Client
 1.  **Zip** the `client` folder (Name it `GestureNav_Client.zip`).
@@ -109,8 +103,6 @@ GestureNav/
 ├── assets/                  # Images and branding resources
 ├── client/                  # Blender Add-on source code
 ├── server/                  # Python Computer Vision source code
-│   ├── main.py              # The Vision Engine
-│   └── hand_landmarker.task # AI Model (downloaded)
 ├── docs/                    # Full project documentation
 ├── requirements.txt         # Python dependencies
 └── README.md                # You are here
