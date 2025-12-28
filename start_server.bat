@@ -52,7 +52,7 @@ echo    GestureNav Server is Running.
 echo    Keep this window open!
 echo =======================================================
 echo.
-python server/main.py
+python -m server.main
 pause
 exit
 
