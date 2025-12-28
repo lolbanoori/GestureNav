@@ -79,7 +79,7 @@ class GestureNavProperties(bpy.types.PropertyGroup):
         name="Zoom In Threshold", default=0.05, min=0.01, max=0.2, update=send_config
     )
     zoom_thresh_out: bpy.props.FloatProperty(
-        name="Zoom Out Threshold", default=0.15, min=0.05, max=0.5, update=send_config
+        name="Zoom Out Threshold", default=0.20, min=0.05, max=0.5, update=send_config
     )
     
     # Safety
@@ -130,7 +130,7 @@ class GestureNav_OT_Reset(bpy.types.Operator):
         props.zoom_sensitivity = 2.0
         props.orbit_sens_server = 3.0
         props.zoom_thresh_in = 0.05
-        props.zoom_thresh_out = 0.15
+        props.zoom_thresh_out = 0.20
         props.use_fist_safety = True
         props.use_open_hand_safety = False
         
