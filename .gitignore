@@ -189,3 +189,7 @@ quit.blend
 # OS Junk
 .DS_Store
 Thumbs.db
+
+# Tooling
+Tools/build-scripts/*.log
+Tools/venv/
