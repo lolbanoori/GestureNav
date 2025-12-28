@@ -1,7 +1,7 @@
 # GestureNav
 > **Touchless 3D Navigation for Blender**
 
-![GestureNav Hero Image](assets/GestureNav_hero.png)
+![GestureNav Hero](assets/branding/GestureNav_hero.png)
 
 <div align="center">
 
