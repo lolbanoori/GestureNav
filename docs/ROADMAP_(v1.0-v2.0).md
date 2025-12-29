@@ -23,7 +23,23 @@
 
 ---
 
-## **Phase 3: The "Virtuoso" Update (v2.0)**
+## **Phase 3: The Refactor (v1.6.0) [COMPLETED]**
+
+*Focus: Scalability, Stability & Code Hygiene*
+
+*   [x] **Modular Architecture:**
+    *   [x] Server: Split into `vision`, `networking`, `config`.
+    *   [x] Client: Split into `ui`, `networking`, `config`.
+*   [x] **Infrastructure:**
+    *   [x] Dedicated `Tools/` directory for automation.
+    *   [x] Clean `assets/` organization.
+*   [x] **Reliability:**
+    *   [x] Fix circular imports via `python -m server.main`.
+    *   [x] Consistent configuration defaults.
+
+---
+
+## **Phase 4: The "Virtuoso" Update (v2.0)**
 
 *Focus: Advanced Control*
 
@@ -33,7 +49,7 @@
 
 ---
 
-## **Phase 3: Advanced Control (v3.0)**
+## **Phase 5: Advanced Control (v3.0)**
 
 *Focus: Beyond Navigation*
 

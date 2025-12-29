@@ -1,5 +1,5 @@
 # **GestureNav Architecture**
-> **Technical Design Document (v1.5)**
+> **Technical Design Document (v1.6.0)**
 
 ## **1. Executive Summary**
 
@@ -13,13 +13,13 @@ We utilize a **Decoupled Client-Server** architecture over a local UDP network. 
 
 ### The Server (Brain): 
 A standalone Python process that runs OpenCV and MediaPipe. 
-*   **Thread 1 (Main):** Captures video, tracks hands using MediaPipe Tasks, calculates vector deltas, and broadcasts navigation data to Port 5555.
+*   **Thread 1 (Main Orchestrator):** Coordinates the `HandTracker` (Vision), `GestureDecider` (Logic), and `GestureSender` (Networking).
 *   **Thread 2 (Config Listener):** Listens on Port 5556 for tuning updates from the Client.
 
 ### The Client (Body): 
 A lightweight Blender Add-on.
-*   **Operator:** Runs a modal timer to listen to Port 5555 and applies transforms to the Viewport.
-*   **UI Panel:** Sends configuration JSON packets to Port 5556 whenever a slider is moved.
+*   **Operator:** A modal operator (`networking.py`) that listens to Port 5555 and applies transforms.
+*   **UI Panel:** A side panel (`ui.py`) that manages the PropertyGroup (`config.py`) and configures the server.
 
 ---
 
@@ -103,10 +103,15 @@ We calculate the distance between **Thumb** and **Index** tips.
 GestureNav/
 ├── assets/                     # Branding
 ├── client/                     # Blender Add-on
-│   ├── __init__.py             # UI, Props, and Lifecycle
-│   └── operator_listen.py      # Modal Operator & Navigation Logic
+│   ├── __init__.py             # Registry
+│   ├── ui.py                   # Panel UI
+│   ├── config.py               # Properties & Settings
+│   └── networking.py           # Logic & Modal Operator
 ├── server/                     # Vision Server
-│   ├── main.py                 # Entry Point (Threads & Logic)
+│   ├── config/                 # Settings.py
+│   ├── networking/             # UDP Sender Class
+│   ├── vision/                 # HandTracking & Analysis
+│   ├── main.py                 # Orchestrator
 │   └── hand_landmarker.task    # Model File
 ├── docs/                       
 │   ├── INSTALL.md              # Installation & Setup Guide

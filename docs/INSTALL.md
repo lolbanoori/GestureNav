@@ -87,5 +87,5 @@ You skipped **Step 3** in Part 1.
 
 ### **Dual-PC Setup (Advanced)**
 To run the server on a laptop and control a desktop:
-1.  **Server:** Edit `main.py` -> Set `UDP_IP = "0.0.0.0"`.
+1.  **Server:** Edit `server/config/settings.py` -> Set `DEFAULT_IP = "0.0.0.0"`.
 2.  **Client:** Edit `__init__.py` -> Set IP to the Laptop's IP address (e.g., `192.168.1.50`).

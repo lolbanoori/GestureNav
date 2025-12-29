@@ -5,8 +5,8 @@
 
 <div align="center">
 
-  <a href="https://github.com/lolbanoori/GestureNav/releases/tag/v1.5">
-    <img src="https://img.shields.io/badge/Download-v1.5-red?style=for-the-badge&logo=windows" alt="Download Release">
+  <a href="https://github.com/lolbanoori/GestureNav/releases/tag/v1.6.0">
+    <img src="https://img.shields.io/badge/Download-v1.6.0-red?style=for-the-badge&logo=windows" alt="Download Release">
   </a>
 
   <a href="docs/INSTALL.md">
@@ -22,7 +22,7 @@
 
 **GestureNav** is a professional tool that decouples computer vision from Blender's internal loop, allowing users to orbit and zoom the 3D viewport using hand gestures captured via a standard webcam.
 
-**v1.5 Update:** Now features **Graceful Shutdown**, a **One-Click Launcher**, and a polished **Configuration Dashboard**!
+**v1.6.0 Update:** Now features a **Modular Architecture** for improved stability, along with **Graceful Shutdown**, a **One-Click Launcher**, and a polished **Configuration Dashboard**!
 
 ---
 
@@ -69,7 +69,7 @@ We have detailed documentation available in the `docs/` folder to help you get s
 *   It will automatically install requirements and download the AI model for you.
 *   *You should see a webcam window appear.*
 
-*(Linux/Mac users: Run `pip install -r requirements.txt` then `python server/main.py`)*
+*(Linux/Mac users: Run `pip install -r requirements.txt` then `python -m server.main`)*
 
 ### 2. Install the Blender Client
 1.  **Zip** the `client` folder (Name it `GestureNav_Client.zip`).
@@ -101,12 +101,19 @@ We have detailed documentation available in the `docs/` folder to help you get s
 ## Directory Structure
 ```
 GestureNav/
-├── assets/                  # Images and branding resources
-├── client/                  # Blender Add-on source code
-├── server/                  # Python Computer Vision source code
+├── assets/                  # Branding & Screenshots
+├── client/                  # Blender Add-on (Modular)
+│   ├── __init__.py          # Registry
+│   ├── config.py            # Settings & Properties
+│   ├── networking.py        # UDP Logic
+│   └── ui.py                # Interface Panel
+├── server/                  # Vision Server (Modular)
+│   ├── config/              # Settings & Constants
+│   ├── networking/          # UDP Server Class
+│   ├── vision/              # MediaPipe Hand Tracking
+│   └── main.py              # Orchestrator
+├── Tools/                   # Build Scripts & Automation
 ├── docs/                    # Full project documentation
-├── .gitattributes
-├── .gitignore
 ├── start_server.bat         # One-Click Launcher
 ├── requirements.txt         # Python dependencies
 └── README.md                # You are here

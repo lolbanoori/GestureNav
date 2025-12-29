@@ -96,10 +96,11 @@ If the camera is drifting, look at the server window. bring your hand back to th
 
 *   **View Spinning Uncontrollably?** → You are outside the "Deadzone." Center your hand.
 *   **Zoom Jumping?** → Your lighting is too dim; the camera can't see your fingertips clearly.
-*   **Can't Connect?** → Ensure you ran `start_server.bat` (or `python server/main.py`) **before** clicking start in Blender.
+*   **Can't Connect?** → Ensure you ran `start_server.bat` (or `python -m server.main`) **before** clicking start in Blender.
 *   **Camera does not move?** → Ensure "Start Listener" is clicked in Blender AND the Python Server window is open.
 *   **Crashes with `NameError`?** → Ensure you are running the latest version of the scripts.
 
 ---
+
 **Author**: Zohair Banoori
-**Version**: 1.5
+**Version**: 1.6.0
