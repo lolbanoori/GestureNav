@@ -1,127 +1,114 @@
-# **GestureNav Architecture**
-> **Technical Design Document (v1.6.0)**
+# **GestureNav Architecture (v1.7.0)**
+> **The Blueprint**
 
-## **1. Executive Summary**
-
-A specialized tool allowing Blender users to orbit and zoom the 3D viewport using hand gestures captured via a laptop webcam. The system prioritizes viewport performance by decoupling heavy computer vision processing from Blender’s internal update loop.
+This document details the technical implementation of GestureNav. It is intended for developers effectively maintain, debug, and extend the system.
 
 ---
 
-## **2. System Pattern: "The Puppet Master"**
+## **1. High-Level Architecture**
 
-We utilize a **Decoupled Client-Server** architecture over a local UDP network. This ensures that the heavy image processing (Server) never blocks the Blender UI thread (Client).
+GestureNav uses a **Decoupled Client-Server** pattern. The heavy computer vision workload runs in a separate process (Server) to ensure the 3D software (Client/Blender) remains responsive.
 
-### The Server (Brain): 
-A standalone Python process that runs OpenCV and MediaPipe. 
-*   **Thread 1 (Main Orchestrator):** Coordinates the `HandTracker` (Vision), `GestureDecider` (Logic), and `GestureSender` (Networking).
-*   **Thread 2 (Config Listener):** Listens on Port 5556 for tuning updates from the Client.
+Communication is **Bidirectional** via local UDP sockets.
 
-### The Client (Body): 
-A lightweight Blender Add-on.
-*   **Operator:** A modal operator (`networking.py`) that listens to Port 5555 and applies transforms.
-*   **UI Panel:** A side panel (`ui.py`) that manages the PropertyGroup (`config.py`) and configures the server.
+```mermaid
+sequenceDiagram
+    participant C as Client (Blender)
+    participant S as Server (Python)
+    
+    Note over S: Vision Loop (30-60Hz)
+    Warning over C: Modal Operator (Draw Cycle)
+
+    loop Navigation Data (Port 5555)
+        S->>C: { x: 0.5, y: -0.2, zoom: 0 }
+        C->>C: Apply Viewport Transform
+    end
+    
+    loop Config Updates (Port 5556)
+        C->>S: { deadzone: 0.15, ... }
+        S->>S: Update Logic Params
+    end
+```
 
 ---
 
-## **3. Data Interface (Bidirectional UDP)**
+## **2. Threading Model**
 
-### Downstream: Navigation Data
-**Server -> Client (Port 5555)**
-*Frequency: 30-60Hz*
+A critical requirement for GestureNav is **Zero UI Freezing**. 
 
-Packet Structure:
+### **The Server (Multithreaded)**
+The Python server uses standard `threading` to handle tasks concurrently:
+1.  **Main Thread (Vision & Logic):** 
+    *   Captures webcam frames.
+    *   Runs MediaPipe inference.
+    *   Calculates gestures.
+    *   Sends UDP packets to Port 5555.
+2.  **Listener Thread (Config):**
+    *   Blocks/Listens on Port 5556 for incoming JSON configuration from Blender.
+    *   Updates shared state variables safely.
+
+### **The Client (Single-Threaded Modal Operator)**
+Blender's Python API is primarily single-threaded. To receive data without freezing the UI, we use a **Modal Operator**.
+
+*   **Modal Execution:** The operator runs every time Blender refreshes (Timer event).
+*   **Non-Blocking I/O:** The UDP socket is set to `blocking(False)`.
+    *   The operator attempts to read a packet.
+    *   If data exists -> Parse & Apply.
+    *   If no data (exception) -> Pass/Return immediately.
+    
+**Why this matters:** If we used a blocking socket or a standard `while True` loop in Blender, the entire interface would freeze until a packet arrived. The Modal/Non-blocking pattern keeps the interface fluid (60fps+) even if the server stalls.
+
+---
+
+## **3. Coordinate System & Math**
+
+### **A. Normalization**
+MediaPipe returns "Normalized Landmarks":
+*   **X:** 0.0 (Left) to 1.0 (Right)
+*   **Y:** 0.0 (Top) to 1.0 (Bottom)
+
+We map the **Wrist Position** to this 0-1 space.
+
+### **B. Centering**
+We define a "Virtual Joystick Center" (default: `(0.5, 0.5)`).
+Movement is calculated as the delta from this center:
+$$ \Delta x = x_{wrist} - 0.5 $$
+$$ \Delta y = y_{wrist} - 0.5 $$
+
+### **C. The Deadzone**
+To prevent drift when the hand is resting, we apply a circular deadzone.
+
+**Algorithm:**
+1.  Calculate Magnitude: $$ d = \sqrt{\Delta x^2 + \Delta y^2} $$
+2.  **If** $ d < \text{DeadzoneRadius} $:
+    *   Output = 0 (Stop)
+3.  **If** $ d \ge \text{DeadzoneRadius} $:
+    *   Subtract the deadzone radius from the magnitude so movement starts smoothly from 0.
+    *   Scale the result by sensitivity.
+    
+    $$ \text{Speed} = \frac{d - \text{DeadzoneRadius}}{1.0 - \text{DeadzoneRadius}} \times \text{Sensitivity} $$
+
+---
+
+## **4. Data Protocol**
+
+### **Packet Structure (Server -> Client)**
+JSON payload sent continuously.
 ```json
 {
-  "state": "active",       // "active" or "idle"
-  "x": 0.5,                // Float: -1.0 to 1.0 (Orbit X Speed)
-  "y": -0.2,               // Float: -1.0 to 1.0 (Orbit Y Speed)
-  "zoom": 1                // Integer: 1 (In), -1 (Out), 0 (None)
+  "state": "active",       // System Status
+  "x": 0.55,               // Horizontal Orbit Speed (-1.0 to 1.0)
+  "y": -0.21,              // Vertical Orbit Speed (-1.0 to 1.0)
+  "zoom": 1                // 1 (In), -1 (Out), 0 (None)
 }
 ```
 
-### Upstream: Configuration Data
-**Client -> Server (Port 5556)**
-*Frequency: On Change*
-
-Packet Structure:
+### **Packet Structure (Client -> Server)**
+JSON payload sent only on user change.
 ```json
 {
-  "deadzone_radius": 0.12,
-  "deadzone_offset_x": 0.75, // 0.25 for Left Hand
-  "zoom_thresh_in": 0.05,
-  "orbit_sens_server": 3.0,
-  "use_fist_safety": true
-  // ... other props
+  "deadzone_radius": 0.15,
+  "zoom_thresh_in": 0.04,
+  "orbit_sens": 2.5
 }
-```
-
----
-
-## **4. Functional Logic**
-
-### A. Orbit (Virtual Joystick) and Deadzone
-We calculate the distance of the **Wrist** from a "Deadzone Center" (configurable).
-*   **Inside Deadzone:** No movement.
-*   **Outside Deadzone:** Movement speed increases linearly (clamped by Max Speed).
-
-### B. Zoom (Discrete Trigger)
-We calculate the distance between **Thumb** and **Index** tips.
-*   **Distance < Threshold_In:** Zoom In.
-*   **Distance > Threshold_Out:** Zoom Out.
-*   **Between:** Idle (Hysteresis loop prevents jitter).
-
-### C. Safety Locks
-1.  **Fist Lock:**
-    *   Logic: Checks average distance of Middle, Ring, and Pinky tips to Wrist.
-    *   If small (< 0.25), input is flagged as a "Fist".
-    *   Result: Zoom Orbit is ignored (Safety).
-2.  **Open Hand Lock:**
-    *   Logic: Checks if fingers are fully extended.
-    *   Result: Orbit is stopped (optional).
-
-### D. System Integrity
-*   **Graceful Shutdown:** The server loop checks for multiple exit signals (window close event, 'Q' key, 'Esc' key) to ensure sockets are closed and cameras released properly to avoid resource leaks.
-
----
-
-## **5. Technology Stack**
-
-| Component | Technology | Role |
-| :---- | :---- | :---- |
-| **Server** | Python 3.10+ | Host Process |
-| **Vision** | MediaPipe Tasks | High-performance Hand Tracking |
-| **Video** | OpenCV | Webcam Capture & Visualization |
-| **Client** | Blender Python API | Add-on & Viewport Control |
-| **Comms** | UDP Sockets | IPC (Inter-Process Communication) |
-| **Persistence** | JSON | Saving user profiles to `~/.gesturenav_config.json` |
-
----
-
-## **6. Directory Structure**
-
-```
-GestureNav/
-├── assets/                     # Branding
-├── client/                     # Blender Add-on
-│   ├── __init__.py             # Registry
-│   ├── ui.py                   # Panel UI
-│   ├── config.py               # Properties & Settings
-│   └── networking.py           # Logic & Modal Operator
-├── server/                     # Vision Server
-│   ├── config/                 # Settings.py
-│   ├── networking/             # UDP Sender Class
-│   ├── vision/                 # HandTracking & Analysis
-│   ├── main.py                 # Orchestrator
-│   └── hand_landmarker.task    # Model File
-├── docs/                       
-│   ├── INSTALL.md              # Installation & Setup Guide
-│   ├── USER_MANUAL.md          # User Manual & Gesture Guide
-│   ├── ARCHITECTURE.md         # Technical Design Document
-│   └── ROADMAP.md              # Product Roadmap
-├── .gitattributes
-├── .gitignore                  
-├── LICENSE                     
-├── start_server.bat            # One-Click Launcher
-├── requirements.txt            # Python dependencies
-└── README.md                   # Overview
 ```
