@@ -193,3 +193,6 @@ Thumbs.db
 # Tooling
 Tools/build-scripts/*.log
 Tools/venv/
+
+# Private Documentation
+private_docs/
