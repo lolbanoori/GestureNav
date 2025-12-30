@@ -1,10 +1,8 @@
 # Changelog
 
-> All notable changes to the **GestureNav** project will be documented in this file.
+> All notable changes to **GestureNav** will be documented in this file.
 
-## [Unreleased]
-*Development in progress for v1.8.0.*
-
+## [1.8.0] - 2025-12-30
 ### Added
 - **CI Pipeline:** Automated GitHub Action (`ci.yml`) to enforce code quality on every push.
 - **Linter Rules:** Added `.flake8` configuration to standardize Python code style (max-line-length: 120).
@@ -13,7 +11,7 @@
 
 ---
 
-## [1.7.0] - 2025-12-30
+## [1.7.0] - 2025-12-29
 ### Added
 - **Architecture:** Created `docs/ARCHITECTURE.md` with High-Level Diagram, Threading Model, and Coordinate System.
 - **Protocol:** Created `docs/PROTOCOL.md` defining Transport (UDP 5005), Packet Structure, and States (ORBIT, ZOOM, LOCK).
@@ -23,7 +21,7 @@
 
 ---
 
-## [1.6.0] - 2025-12-29
+## [1.6.0] - 2025-12-28
 ### Changed
 - **Architectural Refactor:** Complete decoupling of the Server (Vision Engine) and Client (Blender Add-on).
 - **Server:** Split monolithic `main.py` into specialized packages: `server.vision`, `server.networking`, and `server.config`.
@@ -35,7 +33,7 @@
 
 ---
 
-## [1.5.0] - 2024-12-15
+## [1.5.0] - 2025-12-15
 ### Added
 - **Sensitivity Controls:** Added sliders in the N-Panel to adjust Orbit and Zoom sensitivity in real-time.
 - **Handedness Support:** Added toggle for Left/Right hand preference.
@@ -46,7 +44,7 @@
 
 ---
 
-## [1.3.1] - 2024-11-01
+## [1.3.1] - 2025-11-01
 ### Added
 - **Initial Release:** Core GestureNav functionality.
 - **Orbit Mode:** Open palm gesture to rotate the 3D viewport.
