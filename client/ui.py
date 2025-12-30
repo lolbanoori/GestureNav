@@ -12,8 +12,6 @@ class GESTURENAV_PT_Panel(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         
-        # Access the property group. 
-        # We assume it will be registered as 'gesture_nav' in the scene.
         props = getattr(scene, "gesture_nav", None)
         
         if not props:

@@ -10,16 +10,8 @@ def send_config(self, context=None):
     Sends current scene properties to the Python Server via UDP Port 5556.
     'self' is expected to be the GestureNavProperties instance.
     """
-    # Bundle Settings
-    # Note: self refers to the PropertyGroup instance
-    # However, if called from an Operator, self might be the operator
-    # But the property update callback passes the PropertyGroup as self.
-    # If called manually from Operator, we need 'self' to be the properties object or extract from context.
-    
-    # Check if self is GestureNavProperties or an Operator
     properties = self
     if not isinstance(self, GestureNavProperties):
-        # If it's an operator, we assume we can get properties from context
         if context:
             properties = getattr(context.scene, "gesture_nav", None)
             if not properties: return
@@ -108,9 +100,9 @@ class GestureNav_OT_Preset(bpy.types.Operator):
         if self.side == 'RIGHT':
             props.deadzone_x = 0.75
         else:
-            props.deadzone_x = 0.25 # Adjusted for mirror roughly
+            props.deadzone_x = 0.25
             
-        send_config(props, context) # Pass props explicitly as self
+        send_config(props, context)
         self.report({'INFO'}, f"Applied {self.side} Handed Preset")
         return {'FINISHED'}
 
@@ -186,7 +178,6 @@ class GestureNav_OT_LoadSettings(bpy.types.Operator):
             props = getattr(context.scene, "gesture_nav", None)
             if not props: return {'CANCELLED'}
 
-            # Safely set props if keys exist
             if 'deadzone_radius' in data: props.deadzone_radius = data['deadzone_radius']
             if 'deadzone_x' in data: props.deadzone_x = data['deadzone_x']
             if 'deadzone_y' in data: props.deadzone_y = data['deadzone_y']

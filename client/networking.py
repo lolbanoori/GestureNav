@@ -20,7 +20,7 @@ class GestureNav_OT_Start(bpy.types.Operator):
     _current_speed_y = 0.0
     
     # Constants
-    ALPHA = 0.1  # Smoothing factor (Lower = Smoother)
+    ALPHA = 0.1 
     
     def modal(self, context, event):
         scene = context.scene
@@ -43,8 +43,7 @@ class GestureNav_OT_Start(bpy.types.Operator):
                         
                 except json.JSONDecodeError:
                     print(f"[GestureNav] Malformed JSON: {message}")
-            except BlockingIOError:
-                # Still process navigation to handle smoothing decay even if no new packet
+            except BlockingIOError:  
                 pass
             except Exception as e:
                 print(f"[GestureNav] Error: {e}")
@@ -62,14 +61,14 @@ class GestureNav_OT_Start(bpy.types.Operator):
     def run_ops(self, op, override, **kwargs):
         """Execute a bpy.ops operator with context override safely across Blender versions."""
         if hasattr(bpy.context, "temp_override"):
-            # Blender 3.2+
+            # for Blender 3.2+
             try:
                 with bpy.context.temp_override(**override):
                     op(**kwargs)
             except Exception as e:
                 print(f"[GestureNav] Op Error (New API): {e}")
         else:
-            # Blender < 3.2
+            # for Blender < 3.2
             try:
                 op(override, **kwargs)
             except Exception as e:
@@ -80,14 +79,11 @@ class GestureNav_OT_Start(bpy.types.Operator):
         props = getattr(scene, "gesture_nav", None)
         if not props: return
 
-        # 1. State Update (EMA Smoothing)
         target_x = payload.get('x', 0.0)
         target_y = payload.get('y', 0.0)
         
-        # Get Client Sensitivities
         orbit_sens = props.orbit_sensitivity
         
-        # Formula: current = (target * alpha) + (current * (1 - alpha))
         self._current_speed_x = ((target_x * orbit_sens) * self.ALPHA) + (self._current_speed_x * (1.0 - self.ALPHA))
         self._current_speed_y = ((target_y * orbit_sens) * self.ALPHA) + (self._current_speed_y * (1.0 - self.ALPHA))
         
@@ -125,7 +121,6 @@ class GestureNav_OT_Start(bpy.types.Operator):
         # 4. Apply Zoom (Manual Distance for Smoothness)
         zoom_state = payload.get('zoom', 0)
         if zoom_state != 0 and r3d:
-            # Step size per frame
             zoom_sens = props.zoom_sensitivity
             step = 0.01 * zoom_sens
             r3d.view_distance -= zoom_state * step
@@ -135,9 +130,6 @@ class GestureNav_OT_Start(bpy.types.Operator):
         scene = context.scene
         props = getattr(scene, "gesture_nav", None)
         
-        # If props not found or already listening, abort/finish
-        # Wait, if props not found we can't really set listening = True.
-        # But we must handle the case where we can't find props.
         if not props:
             self.report({'ERROR'}, "GestureNav Properties not found. Please reload addon.")
             return {'CANCELLED'}

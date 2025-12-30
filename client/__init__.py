@@ -34,7 +34,6 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
         
-    # Register the Property Group Pointer
     bpy.types.Scene.gesture_nav = bpy.props.PointerProperty(type=GestureNavProperties)
 
 def unregister():
