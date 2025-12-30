@@ -8,6 +8,8 @@
 - **Linter Rules:** Added `.flake8` configuration to standardize Python code style (max-line-length: 120).
 - **Issue Templates:** Standardized `bug_report.md` and `feature_request.md` forms to improve user reporting.
 - **PR Template:** Added checklist for contributors to ensure quality before merging.
+- **Automated Releases:** Added `release.yml` to automatically draft releases and attach zips on version change.
+- **Build Scripts:** Created `Tools/build-scripts/package_addon.py` for automated zipping of the client.
 
 ---
 

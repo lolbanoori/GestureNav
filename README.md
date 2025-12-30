@@ -5,8 +5,8 @@
 
 <div align="center">
 
-  <a href="https://github.com/lolbanoori/GestureNav/releases/tag/v1.6.0">
-    <img src="https://img.shields.io/badge/Download-v1.6.0-red?style=for-the-badge&logo=windows" alt="Download Release">
+  <a href="https://github.com/lolbanoori/GestureNav/releases/tag/v1.8.0">
+    <img src="https://img.shields.io/badge/Download-v1.8.0-red?style=for-the-badge&logo=windows" alt="Download Release">
   </a>
 
   <a href="docs/INSTALL.md">
@@ -22,7 +22,7 @@
 
 **GestureNav** is a professional tool that decouples computer vision from Blender's internal loop, allowing users to orbit and zoom the 3D viewport using hand gestures captured via a standard webcam.
 
-**v1.6.0 Update:** Now features a **Modular Architecture** for improved stability, along with **Graceful Shutdown**, a **One-Click Launcher**, and a polished **Configuration Dashboard**!
+**v1.8.0 Update:** Now features a **DevOps Pipeline** with automated CI/CD checks, standardized Issue Templates, and automated Release generation!
 
 ---
 

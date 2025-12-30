@@ -44,9 +44,10 @@ Instead of zipping and installing every time:
 We adhere to strict coding standards to keep the codebase clean.
 
 ### Python Code
-*   **Naming:** Use `camelCase` for variables and functions (e.g., `calculateVelocity`, `gestureState`).
+*   **Naming:** Use `snake_case` for variables and functions (e.g., `calculate_velocity`, `gesture_state`).
 *   **Classes:** Use `PascalCase` (e.g., `HandTracker`, `GestureSender`).
 *   **Formatting:** Follow PEP 8. Use 4 spaces for indentation.
+*   **Linting:** We use `flake8` to enforce style. Run `flake8 .` before pushing.
 *   **Strings:** Use double quotes `"` unless the string contains double quotes.
 
 ### Documentation
@@ -59,9 +60,11 @@ We adhere to strict coding standards to keep the codebase clean.
 ## Pull Request Process
 
 1.  **Issue Link:** Every Pull Request (PR) must be linked to an existing Issue. If one doesn't exist, create it first.
+    *   Use the **Bug Report** or **Feature Request** templates provided.
 2.  **Descriptive Title:** Use a title that explains *what* changed (e.g., "Fix UDP timeout on server shutdown" not "Fix bug").
 3.  **Scope:** Keep PRs small and focused. One feature/bugfix per PR.
-4.  **Pass Tests:** Ensure the code runs without errors.
+4.  **Pass Tests & Linting:** 
+    *   **CI Checks:** Ensure the automated GitHub Action passes (it checks `flake8` syntax).
     *   **Server:** Verify `python server/main.py` starts and tracks hands.
     *   **Client:** Verify the addon loads in Blender without console errors.
 

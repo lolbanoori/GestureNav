@@ -54,18 +54,22 @@
 
 ---
 
-## **Active Development**
-
-### **The DevOps Pipeline (v1.8.0) [IN PROGRESS]**
+### **The DevOps Pipeline (v1.8.0) [COMPLETED]**
 
 *Focus: Automation & Quality Assurance*
 
-* [ ] **The Gatekeeper (CI):**
-    * [ ] GitHub Actions workflow for Python Linting (`flake8`).
-    * [ ] Issue and Pull Request Templates.
-* [ ] **The Factory (CD):**
-    * [ ] Automated Packaging Script (`Tools/build-scripts/package_addon.py`).
-    * [ ] Auto-release generation on Tag push.
+* [x] **The Gatekeeper (CI):**
+    * [x] GitHub Actions workflow for Python Linting (`flake8`).
+    * [x] Issue and Pull Request Templates.
+* [x] **The Factory (CD):**
+    * [x] Automated Packaging Script (`Tools/build-scripts/package_addon.py`).
+    * [x] Auto-release generation on Tag push.
+
+---
+
+## **Active Development**
+
+> *The developer is currently stuck in exams* 🥀💔
 
 ---
 
