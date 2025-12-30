@@ -86,20 +86,10 @@
 
 ---
 
-### **The "Virtuoso" Update (v2.0)**
+### **The "Virtuoso" Update (v2.0.0)**
 
 *Focus: Advanced Control Mechanics*
 
 * [ ] **Feature: Panning (Strafe).** "Open Palm" gesture to move view laterally.
 * [ ] **Feature: View Snapping.** "Swipes" to snap to Front/Side/Top views.
 * [ ] **Feature: Focus Selected.** "Double Pinch" to center view.
-
----
-
-### **Advanced Control (v3.0)**
-
-*Focus: Beyond Navigation*
-
-* [ ] **Custom Gestures:** Map specific hand signs (e.g., "Peace Sign") to custom operators.
-* [ ] **Direct Hand Rendering:** Draw full hand skeleton in 3D space using `gpu` module.
-* [ ] **Standalone Compilation:** Compile Server to `.exe` using Nuitka/PyInstaller.
