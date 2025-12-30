@@ -2,3 +2,5 @@
 max-line-length = 120
 exclude = .git,__pycache__,build,dist,venv,Tools
 ignore = E402
+per-file-ignores =
+    client/config.py:F722,F821
