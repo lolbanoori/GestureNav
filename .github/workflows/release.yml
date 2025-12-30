@@ -1,0 +1,37 @@
+name: Auto-Release (Draft)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'client/__init__.py'  # Trigger ONLY when version changes
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: Build Add-on & Extract Version
+        id: build_step
+        run: python Tools/build-scripts/package_addon.py
+
+      - name: Create Release Draft
+        uses: softprops/action-gh-release@v1
+        with:
+          # Automatically create the Git Tag (e.g., v1.9.0)
+          tag_name: v${{ steps.build_step.outputs.VERSION }}
+          name: v${{ steps.build_step.outputs.VERSION }}
+          files: ${{ steps.build_step.outputs.FILENAME }}
+          draft: true  # SAFETY ON: Creates a draft, does not publish
+          generate_release_notes: true
