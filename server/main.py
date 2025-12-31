@@ -41,7 +41,7 @@ def config_listener(decider: GestureDecider):
 
 def main():
     global stop_server
-    print(f"Starting GestureNav Server (v1.6.0) on {settings.DEFAULT_IP}:{settings.DEFAULT_PORT}")
+    print(f"Starting GestureNav Server (v1.8.0) on {settings.DEFAULT_IP}:{settings.DEFAULT_PORT}")
 
     # 1. Initialize Components
     tracker = HandTracker()

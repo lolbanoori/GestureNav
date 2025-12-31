@@ -1,5 +1,5 @@
 @echo off
-TITLE GestureNav Vision Server
+TITLE GestureNav Vision Server v1.8.0
 CLS
 
 :: Ensure we are in the script's directory
