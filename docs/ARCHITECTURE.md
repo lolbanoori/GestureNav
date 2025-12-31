@@ -17,7 +17,7 @@ sequenceDiagram
     participant S as Server (Python)
     
     Note over S: Vision Loop (30-60Hz)
-    Warning over C: Modal Operator (Draw Cycle)
+    Note over C: Modal Operator (Draw Cycle)
 
     loop Navigation Data (Port 5555)
         S->>C: { x: 0.5, y: -0.2, zoom: 0 }
