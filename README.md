@@ -3,6 +3,8 @@
 
 ![GestureNav Hero](assets/branding/GestureNav_hero.png)
 
+<div align="center">
+
 <a href="https://github.com/lolbanoori/GestureNav/releases/tag/v1.8.0">
   <img src="https://img.shields.io/badge/Download-v1.8.0-red?style=for-the-badge&logo=windows" alt="Download Release">
 </a>
@@ -12,6 +14,8 @@
 <a href="docs/USER_MANUAL.md">
   <img src="https://img.shields.io/badge/User-Manual-blue?style=for-the-badge" alt="Read Manual">
 </a>
+
+</div>
 
 **GestureNav** is a professional tool that decouples computer vision from Blender's internal loop, allowing users to orbit and zoom the 3D viewport using hand gestures captured via a standard webcam.
 
